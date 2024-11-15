@@ -1,0 +1,7 @@
+@media screen and (min-width: 3182px) {
+    .black-block-outside {
+        inset: 0% auto 0% -70%;
+        z-index: 5;
+    }
+ }
+  
