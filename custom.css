@@ -11,7 +11,7 @@
         z-index: 5;
     }
  }
- .system-audit-block input{
+ .hbspt-form input{
     color: #fff;
     background-color: #fff0;
     border: 1px solid #878787;
@@ -26,6 +26,6 @@
     font-weight: 400;
     line-height: 17.64px;
  }
- fieldset.form-columns-2 .input{
+ .hbspt-form .input{
     margin:0!important;
  }
