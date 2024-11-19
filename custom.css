@@ -11,7 +11,7 @@
         z-index: 5;
     }
  }
-.hs-input{
+.hbspt-form input{
     color: #fff!important;
     background-color: #fff0!important;
     border: 1px solid #878787!important;
@@ -26,6 +26,6 @@
     font-weight: 400!important;
     line-height: 17.64px!important;
  }
-.hs-input{
+.hbspt-form .input{
     margin:0!important;
  }
