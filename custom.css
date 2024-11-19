@@ -84,3 +84,11 @@
     margin-top: 8px!important;
     color: red !important;
 }
+
+/* Tablet */
+@media (max-width: 767px) { 
+    .hbspt-form fieldset {
+        flex-direction: column;
+    }
+  }
+  
