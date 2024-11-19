@@ -86,6 +86,16 @@
     color: red !important;
 }
 
+.hbspt-form .submitted-message {
+    color: var(--white);
+    text-align: center;
+    letter-spacing: normal;
+    margin-bottom: 10px;
+    font-family: Archivo, sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+}
+
 /* Tablet */
 @media (max-width: 767px) { 
     .hbspt-form fieldset {
