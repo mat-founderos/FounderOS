@@ -74,6 +74,7 @@
     line-height: 100%!important;
     transition: all .2s!important;
     position: relative!important;
+    cursor: pointer!important;
  }
  .hbspt-form .hs-button:hover {
     color: var(--green-yellow)!important;
