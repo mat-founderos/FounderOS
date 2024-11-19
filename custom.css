@@ -79,3 +79,7 @@
     color: var(--green-yellow)!important;
     background-color: #0000!important;
 }
+
+.hbspt-form .hs-error-msg{
+    color: red;
+}
