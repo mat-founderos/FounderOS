@@ -52,3 +52,7 @@
  .hbspt-form li{
     list-style: none;
  }
+
+ .hbspt-form fieldset div{
+    width: 100%;
+ }
