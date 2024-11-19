@@ -80,6 +80,6 @@
     background-color: #0000!important;
 }
 
-.hbspt-form .hs-error-msg{
-    color: red;
+.hbspt-form .hs-error-msg {
+    color: red !important;
 }
