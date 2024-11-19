@@ -59,3 +59,23 @@
  .hbspt-form fieldset.form-columns-0 {
     margin-bottom: -30px !important;
  }
+ .hbspt-form .hs-button{
+    border: 1px solid var(--green-yellow);
+    background-color: var(--green-yellow);
+    color: var(--black);
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 5px;
+    margin-right: 0;
+    padding: 16px 52px 13px;
+    font-family: Blmelody Edit, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 100%;
+    transition: all .2s;
+    position: relative;
+ }
+ .hbspt-form .hs-button:hover {
+    color: var(--green-yellow);
+    background-color: #0000;
+}
