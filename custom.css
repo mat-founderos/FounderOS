@@ -35,14 +35,14 @@
 .hbspt-form .input{
     margin:0!important;
  }
- .hbspt-form label{
-    color: #fff;
-    margin-bottom: 0;
-    font-family: Blmelody Edit, sans-serif;
-    font-size: 15px;
-    font-weight: 300;
-    line-height: 160%;
-    margin-bottom: 8px;
+ .hbspt-form label, .hs-richtext p span{
+    color: #fff!important;
+    margin-bottom: 0!important;
+    font-family: Blmelody Edit, sans-serif!important;
+    font-size: 15px!important;
+    font-weight: 300!important;
+    line-height: 160%!important;
+    margin-bottom: 8px!important;
  }
  .hbspt-form form{
     display: flex;
