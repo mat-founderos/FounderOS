@@ -42,9 +42,13 @@
     font-size: 15px;
     font-weight: 300;
     line-height: 160%;
+    margin-bottom: 8px;
  }
  .hbspt-form form{
     display: flex;
     flex-direction: column;
     gap: 25px;
+ }
+ .hbspt-form li{
+    list-style: none;
  }
