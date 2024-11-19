@@ -81,5 +81,6 @@
 }
 
 .hbspt-form .hs-error-msg {
+    margin-top: 8px!important;
     color: red !important;
 }
