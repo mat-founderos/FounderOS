@@ -56,3 +56,6 @@
  .hbspt-form fieldset div{
     width: 100%;
  }
+ .hbspt-form fieldset.form-columns-0 {
+    margin-bottom: -30px !important;
+ }
