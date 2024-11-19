@@ -5,3 +5,27 @@
     }
  }
   
+ @media screen and (min-width: 3182px) {
+    .black-block-outside {
+        inset: 0% auto 0% -70%;
+        z-index: 5;
+    }
+ }
+ .system-audit-block input{
+    color: #fff;
+    background-color: #fff0;
+    border: 1px solid #878787;
+    border-radius: 5px;
+    flex: 1;
+    height: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 16px 12px 13px;
+    font-family: BL Melody Regular, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 17.64px;
+ }
+ fieldset.form-columns-2 .input{
+    margin:0!important;
+ }
