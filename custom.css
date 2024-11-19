@@ -87,13 +87,13 @@
 }
 
 .hbspt-form .submitted-message {
-    color: var(--white);
-    text-align: center;
-    letter-spacing: normal;
-    margin-bottom: 10px;
-    font-family: Archivo, sans-serif;
-    font-size: 22px;
-    font-weight: 400;
+    color: var(--white)!important;
+    text-align: center!important;
+    letter-spacing: normal!important;
+    margin-bottom: 10px!important;
+    font-family: Archivo, sans-serif!important;
+    font-size: 22px!important;
+    font-weight: 400!important;
 }
 
 /* Tablet */
