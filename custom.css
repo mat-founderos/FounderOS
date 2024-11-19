@@ -25,7 +25,26 @@
     font-size: 15px!important;
     font-weight: 400!important;
     line-height: 17.64px!important;
+    width: 100%;
+ }
+ .hbspt-form fieldset{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
  }
 .hbspt-form .input{
     margin:0!important;
+ }
+ .hbspt-form label{
+    color: #fff;
+    margin-bottom: 0;
+    font-family: Blmelody Edit, sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 160%;
+ }
+ .hbspt-form form{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
  }
