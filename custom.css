@@ -103,6 +103,9 @@ label.hs-form-radio-display {
    align-content: center;
    align-items: center;
 }
+label.hs-form-radio-display span{
+   padding-top: 2px;
+}
 
 /* Tablet */
 @media (max-width: 767px) { 
