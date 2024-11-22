@@ -96,7 +96,13 @@
     font-weight: 400!important;
 }
 
-
+label.hs-form-radio-display {
+   display: inline-flex;
+   gap: 8px;
+   flex-direction: row;
+   align-content: center;
+   align-items: center;
+}
 
 /* Tablet */
 @media (max-width: 767px) { 
