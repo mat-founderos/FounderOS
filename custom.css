@@ -28,6 +28,9 @@
     line-height: 17.64px!important;
     width: 100%;
  }
+ ul.no-list.hs-error-msgs.inputs-list {
+   position: absolute;
+}
  .hbspt-form select{
    background-color: #000!important;
  }
