@@ -106,7 +106,7 @@ label.hs-form-radio-display {
 label.hs-form-radio-display span{
    padding-top: 2px;
 }
-.BuyButton-ButtonTextContainer {
+.BuyButton-Button {
 border: 1px solid var(--green-yellow)!important;
 text-align: center!important;
 text-transform: uppercase!important;
