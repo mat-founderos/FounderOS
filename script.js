@@ -73,8 +73,7 @@ $(document).ready(function () {
         iframeWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
     };
 
-    $(".stripe-button").click(function (e) { 
-        e.preventDefault();
+    $(".stripe-button").click(function () { 
         $(".stripe-buy-button").click();
         console.log("CTA has been clicked")
       });
