@@ -106,7 +106,25 @@ label.hs-form-radio-display {
 label.hs-form-radio-display span{
    padding-top: 2px;
 }
-
+.BuyButton-ButtonTextContainer{
+border: 1px solid var(--green-yellow);
+text-align: center;
+text-transform: uppercase;
+border-radius: 4px;
+margin-top: 0;
+margin-right: 0;
+width: 100%;
+max-width: 190px;
+font-family: Belfast grotesk, system-ui;
+font-size: 14px;
+font-weight: 700;
+line-height: 1.112;
+transition: all .2s;
+position: relative;
+background-color: rgb(217, 252, 103);
+color: rgb(0, 0, 0);
+--merchant-button-color: #d9fc67;
+}
 /* Tablet */
 @media (max-width: 767px) { 
     .hbspt-form fieldset {
