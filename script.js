@@ -15,11 +15,8 @@ $(document).ready(function () {
             window.location.href = redirectUrl;
         });
     }
-    
     handleFormSubmission(".workshop-form-hubspot");
-});
 
-$(document).ready(function() {
     // Function to play the video by resetting the iframe src
     function playVideo(iframe) {
         var iframeSrc = iframe.attr('src');
@@ -66,15 +63,23 @@ $(document).ready(function() {
             pauseVideo($(this));  // Pause each video on the page
         });
     });
-});
 
-$(document).ready(function() {
+
+
     var iframe = $('iframe.testimonial-video-1')[0];
     var iframeWindow = iframe.contentWindow;
-
     // Check if the video player has an autoplay feature
     iframe.onload = function() {
         iframeWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
     };
+
+    $(".stripe-button").click(function (e) { 
+        e.preventDefault();
+        $("stripe-buy-button").click();
+        $("BuyButton-ButtonTextContainer").click();
+        console.log("CTA has been clicked")
+      });
+
 });
+
 
