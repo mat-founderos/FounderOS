@@ -75,7 +75,7 @@ $(document).ready(function () {
 
     $(".stripe-button").click(function (e) { 
         e.preventDefault();
-        $("stripe-buy-button").click();
+        $(".stripe-buy-button").click();
         console.log("CTA has been clicked")
       });
 
