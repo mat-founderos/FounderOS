@@ -16,7 +16,7 @@
    width: 100%;
  }
 
-.hbspt-form input, .hbspt-form textarea, .hbspt-form select, .hsfc-Form input, .hsfc-Form textarea, .hsfc-Form select{
+.hbspt-form input, .hbspt-form textarea, .hbspt-form select, .hsfc-Form input, .hsfc-Form textarea, .hbspt-form select{
     color: #fff!important;
     background-color: #fff0!important;
     border: 1px solid #878787!important;
