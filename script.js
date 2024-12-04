@@ -76,4 +76,8 @@ $(document).ready(function () {
 
 });
 
-
+$(".gift-box-form").submit(()=>{
+    // console.log("Form Submitted Welcome Gift Box");
+    $(".gift-box-success").show();
+    $(".gift-box-form").show();
+});
