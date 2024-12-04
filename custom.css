@@ -137,6 +137,10 @@ background-color: rgb(217, 252, 103)!important;
 color: rgb(0, 0, 0)!important;
 --merchant-button-color: #d9fc67!important;
 }
+
+.gift-box-form div{
+   gap:30px;
+}
 /* Tablet */
 @media (max-width: 767px) { 
     .hbspt-form fieldset {
