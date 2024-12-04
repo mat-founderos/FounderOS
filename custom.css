@@ -138,8 +138,8 @@ color: rgb(0, 0, 0)!important;
 --merchant-button-color: #d9fc67!important;
 }
 
-.gift-box-form div{
-   gap:30px;
+.field-container .iti.iti--allow-dropdown {
+   width: 100%;
 }
 /* Tablet */
 @media (max-width: 767px) { 
