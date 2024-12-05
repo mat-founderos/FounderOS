@@ -39,6 +39,7 @@
    background-color: #000!important;
  }
  .hbspt-form fieldset{
+   width: 100%;
     display: flex;
     flex-direction: row;
     gap: 15px;
@@ -60,6 +61,7 @@
     display: flex;
     flex-direction: column;
     gap: 25px;
+    align-items: flex-start;
  }
  .hbspt-form li{
     list-style: none;
