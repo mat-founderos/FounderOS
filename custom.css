@@ -66,6 +66,7 @@
 
  .lead-magnet .hbspt-form form{
    gap: 16px!important;
+   align-items: flex-start!important;
  }
 
  .hbspt-form li{
