@@ -63,6 +63,11 @@
     gap: 25px;
     align-items: center;
  }
+
+ .lead-magnet .hbspt-form form{
+   gap: 25px!important;
+ }
+
  .hbspt-form li{
     list-style: none;
  }
