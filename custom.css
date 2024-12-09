@@ -51,7 +51,7 @@
  .hbspt-form label, .hs-richtext p span{
     color: #fff!important;
     margin-bottom: 0!important;
-    font-family: Blmelody Edit, sans-serif!important;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif!important;
     font-size: 15px!important;
     font-weight: 400!important;
     line-height: 160%!important;
@@ -66,9 +66,17 @@
 
  .lead-magnet .hbspt-form form{
    gap: 16px!important;
-   align-items: flex-start!important;
+   align-items: flex-start;
  }
-
+ .lead-magnet ul.no-list.hs-error-msgs.inputs-list {
+   display: none;
+}
+c ul.no-list.hs-error-msgs.inputs-list {
+   position: static;
+}
+.lead-magnet ul.no-list.hs-error-msgs.inputs-list label {
+   color: red !important;
+}
  .hbspt-form li{
     list-style: none;
  }
@@ -88,7 +96,7 @@
     border-radius: 5px!important;
     margin-right: 0!important;
     padding: 16px 52px 13px!important;
-    font-family: Blmelody Edit, sans-serif!important;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif!important;
     font-size: 15px!important;
     font-weight: 600!important;
     line-height: 100%!important;
