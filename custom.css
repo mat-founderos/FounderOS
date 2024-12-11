@@ -169,6 +169,17 @@ color: rgb(0, 0, 0)!important;
 .lead-magnet .iti.iti--allow-dropdown{
    width:100%!important;
 }
+
+.phone-default-field input{
+   padding-left: 52px !important;
+}
+
+.lead-magnet .iti__flag.iti__ph {
+   width:20px!important;
+}
+.lead-magnet .iti__arrow {
+   width:auto!important;
+}
 /* Tablet */
 @media (max-width: 767px) { 
     .hbspt-form fieldset {
