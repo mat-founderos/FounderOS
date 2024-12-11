@@ -180,6 +180,10 @@ color: rgb(0, 0, 0)!important;
 .lead-magnet .iti__arrow {
    width:auto!important;
 }
+
+.lead-magnet .iti__flag-box {
+   width: 20px !important;
+}
 /* Tablet */
 @media (max-width: 767px) { 
     .hbspt-form fieldset {
