@@ -113,7 +113,7 @@ c ul.no-list.hs-error-msgs.inputs-list {
 }
 
 .hbspt-form .hs-error-msg {
-    margin-top: 8px!important;
+    margin-top: 0px!important;
     color: red !important;
 }
 
