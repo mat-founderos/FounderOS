@@ -57,6 +57,9 @@
     line-height: 160%!important;
     margin-bottom: 2px!important;
  }
+.system-audit-form .hbspt-form label{
+   opacity: 50%;
+}
  .hbspt-form form{
     display: flex;
     flex-direction: column;
