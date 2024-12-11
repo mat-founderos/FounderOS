@@ -58,7 +58,7 @@
     margin-bottom: 2px!important;
  }
 .system-audit-form .hbspt-form label{
-   opacity: 50%;
+   /* opacity: 50%; */
 }
  .hbspt-form form{
     display: flex;
