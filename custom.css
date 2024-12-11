@@ -154,41 +154,19 @@ color: rgb(0, 0, 0)!important;
 --merchant-button-color: #d9fc67!important;
 }
 
-.field-container .iti.iti--allow-dropdown {
-   width: 100%;
-}
-
+.field-container .iti.iti--allow-dropdown {width: 100%;}
 .iti__country-list{
    background-color: #00000096!important;
    backdrop-filter: blur(5px);
 }
-.iti-mobile .iti__country {
-   color: white!important;
-}
-
-.lead-magnet .iti.iti--allow-dropdown{
-   width:100%!important;
-}
-
-.phone-default-field input{
-   padding-left: 52px !important;
-}
-
-.lead-magnet .iti__flag.iti__ph {
-   width:20px!important;
-}
-.lead-magnet .iti__arrow {
-   width:auto!important;
-}
-
-.lead-magnet .iti__flag-box {
-   width: 20px !important;
-}
-
-.lead-magnet .iti__flag-container {
-   width: 50px !important;
-}
-
+.iti-mobile .iti__country {color: white!important;}
+.lead-magnet .iti.iti--allow-dropdown{width:100%!important;}
+.phone-default-field input{padding-left: 52px !important;}
+.lead-magnet .iti__flag.iti__ph {width:20px!important;}
+.lead-magnet .iti__arrow { width:auto!important;}
+.lead-magnet .iti__flag-box { width: 20px !important;}
+.lead-magnet .iti__flag-container { width: 50px !important;}
+.lead-magnet .hs-phone label { display: none;}
 /* Tablet */
 @media (max-width: 767px) { 
    .lead-magnet .text-field-form-workshop-hubspot{
