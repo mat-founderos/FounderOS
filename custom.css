@@ -165,6 +165,10 @@ color: rgb(0, 0, 0)!important;
 .iti-mobile .iti__country {
    color: white!important;
 }
+
+.lead-magnet .iti.iti--allow-dropdown{
+   width:100%!important;
+}
 /* Tablet */
 @media (max-width: 767px) { 
     .hbspt-form fieldset {
