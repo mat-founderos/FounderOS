@@ -163,7 +163,7 @@ color: rgb(0, 0, 0)!important;
    backdrop-filter: blur(5px);
 }
 
-
+.iti__country-name {color: white!important;}
 .iti-mobile .iti__country {color: white!important;}
 .lead-magnet .iti.iti--allow-dropdown, .system-audit-form .iti.iti--allow-dropdown{width:100%!important;}
 .phone-default-field input{padding-left: 52px !important;}
