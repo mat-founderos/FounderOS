@@ -188,8 +188,12 @@ color: rgb(0, 0, 0)!important;
 .lead-magnet .iti__flag-container {
    width: 50px !important;
 }
+
 /* Tablet */
 @media (max-width: 767px) { 
+   .lead-magnet .text-field-form-workshop-hubspot{
+      max-height: 100%;
+   }
     .hbspt-form fieldset {
         flex-direction: column;
         gap:25px!important;
