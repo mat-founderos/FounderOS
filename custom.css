@@ -74,7 +74,7 @@
  .lead-magnet ul.no-list.hs-error-msgs.inputs-list {
    display: none;
 }
-c ul.no-list.hs-error-msgs.inputs-list {
+ ul.no-list.hs-error-msgs.inputs-list {
    position: static;
 }
 .lead-magnet ul.no-list.hs-error-msgs.inputs-list label {
@@ -162,17 +162,20 @@ color: rgb(0, 0, 0)!important;
    background-color: #00000096!important;
    backdrop-filter: blur(5px);
 }
+
+
 .iti-mobile .iti__country {color: white!important;}
-.lead-magnet .iti.iti--allow-dropdown{width:100%!important;}
+.lead-magnet .iti.iti--allow-dropdown, .system-audit-form .iti.iti--allow-dropdown{width:100%!important;}
 .phone-default-field input{padding-left: 52px !important;}
-.lead-magnet .iti__flag.iti__ph {width:20px!important;}
-.lead-magnet .iti__arrow { width:auto!important;}
-.lead-magnet .iti__flag-box { width: 20px !important;}
-.lead-magnet .iti__flag-container { width: 50px !important;}
-.lead-magnet .hs-phone label { display: none;}
+.lead-magnet .iti__flag.iti__ph , .system-audit-form .iti__flag.iti__ph{width:20px!important;}
+.lead-magnet .iti__arrow, .system-audit-form .iti__arrow { width:auto!important;}
+.lead-magnet .iti__flag-box, .system-audit-form .iti__flag-box { width: 20px !important;}
+.lead-magnet .iti__flag-container, .system-audit-form .iti__flag-container { width: 50px !important;}
+.lead-magnet .hs-phone label, .system-audit-form .hs-phone label { display: none;}
+
 /* Tablet */
 @media (max-width: 767px) { 
-   .lead-magnet .text-field-form-workshop-hubspot{
+   .lead-magnet .text-field-form-workshop-hubspot, .system-audit-form .text-field-form-workshop-hubspot{
       max-height: 100%;
    }
     .hbspt-form fieldset {
