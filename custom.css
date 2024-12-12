@@ -178,7 +178,7 @@ color: rgb(0, 0, 0)!important;
 .lead-magnet .iti__flag-container, .system-audit-form .iti__flag-container { width: 50px !important;}
 .lead-magnet .hs-phone label, .system-audit-form .hs-phone label { display: none;}
 
-section#wall-container div {
+.text-testimonial {
    font-family: Blmelody Edit, sans-serif !important;
 }
 section#wall-container button {
