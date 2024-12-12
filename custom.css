@@ -178,7 +178,7 @@ color: rgb(0, 0, 0)!important;
 .lead-magnet .iti__flag-container, .system-audit-form .iti__flag-container { width: 50px !important;}
 .lead-magnet .hs-phone label, .system-audit-form .hs-phone label { display: none;}
 
-.text-testimonial {
+section#wall-container div {
    font-family: Blmelody Edit, sans-serif !important;
 }
 section#wall-container button {
@@ -188,6 +188,11 @@ section#wall-container button {
    border: none!important;
    color: #1c1c1c!important;
 }
+section#wall-container.underline {
+   color: #D9FC67 !important;
+   text-decoration: none !important;
+}
+
 
 /* Tablet */
 @media (max-width: 767px) { 
