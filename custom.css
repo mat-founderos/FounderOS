@@ -178,6 +178,10 @@ color: rgb(0, 0, 0)!important;
 .lead-magnet .iti__flag-container, .system-audit-form .iti__flag-container { width: 50px !important;}
 .lead-magnet .hs-phone label, .system-audit-form .hs-phone label { display: none;}
 
+section#wall-container div {
+   font-family: Blmelody Edit, sans-serif !important;
+}
+
 /* Tablet */
 @media (max-width: 767px) { 
    .lead-magnet .text-field-form-workshop-hubspot, .system-audit-form .text-field-form-workshop-hubspot{
