@@ -181,6 +181,13 @@ color: rgb(0, 0, 0)!important;
 section#wall-container div {
    font-family: Blmelody Edit, sans-serif !important;
 }
+section#wall-container button {
+   font-family: Arial;
+   font-weight: 600;
+   background-color: #d9fc67;
+   border: none;
+   color: #1c1c1c;
+}
 
 /* Tablet */
 @media (max-width: 767px) { 
