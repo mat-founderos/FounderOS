@@ -12,3 +12,8 @@ p.title {
     font-size: 13.5px !important;
     font-weight: 300 !important;
 }
+span.underline.hover\:font-bold.cursor-pointer{
+    bottom: -4px !important;
+    position: relative;
+    color: #d9fc67;
+}
