@@ -24,3 +24,9 @@ span.underline.hover\:font-bold.cursor-pointer{
 section#wall-container .px-4 {
     padding: 0 !important;
 }
+
+img.w-full.object-contain[alt="Video Poster"] {
+    padding: 10px!important;
+    border-radius: 7px !important;
+    overflow: hidden;
+}
