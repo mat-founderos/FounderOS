@@ -20,3 +20,7 @@ span.underline.hover\:font-bold.cursor-pointer{
 .masonry-grid {
     grid-template-columns: repeat(auto-fill, 350px) !important;
 }
+
+section#wall-container .px-4 {
+    padding: 0 !important;
+}
