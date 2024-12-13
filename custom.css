@@ -193,7 +193,10 @@ section#wall-container.underline {
    text-decoration: none !important;
 }
 
-
+p.title {
+   font-size: .85rem !important;
+   font-weight: 400 !important;
+}
 /* Tablet */
 @media (max-width: 767px) { 
    .lead-magnet .text-field-form-workshop-hubspot, .system-audit-form .text-field-form-workshop-hubspot{

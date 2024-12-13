@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'BLMelody-Light';
+    src: url('https://raw.githack.com/mat-founderos/FounderOS/main/BLMelody-Light.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'BLMelody-Light', sans-serif;
+}
