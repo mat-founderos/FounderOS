@@ -8,3 +8,7 @@
 body {
     font-family: 'BLMelody-Light', sans-serif;
 }
+p.title {
+    font-size: 13.5px !important;
+    font-weight: 300 !important;
+}
