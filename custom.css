@@ -11,7 +11,7 @@
         z-index: 5;
     }
  }
- html,body{
+ html, body, .wf-loading{
    background-color: #000!important;
  }
 
