@@ -222,7 +222,9 @@ p.title {
 .email-mini-course-form---hubsspot .hbspt-form{
    gap: 15px;
 }
-
+.email-mini-course-form---hubsspot .actions{
+   width: 100%;
+}
 
 
 /* Tablet */
