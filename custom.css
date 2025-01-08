@@ -222,7 +222,7 @@ p.title {
 .email-mini-course-form---hubsspot .hbspt-form{
    gap: 15px!important;
 }
-.email-mini-course-form---hubsspot .actions{
+.email-mini-course-form---hubsspot .actions, .email-mini-course-form---hubsspot .hs_submit{
    width: 100%!important;
 }
 .email-mini-course-form---hubsspot ul.no-list.hs-error-msgs.inputs-list {
