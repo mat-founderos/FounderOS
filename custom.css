@@ -220,12 +220,14 @@ p.title {
 }
 
 .email-mini-course-form---hubsspot .hbspt-form{
-   gap: 15px;
+   gap: 15px!important;
 }
 .email-mini-course-form---hubsspot .actions{
-   width: 100%;
+   width: 100%!important;
 }
-
+.email-mini-course-form---hubsspot ul.no-list.hs-error-msgs.inputs-list {
+   display: none!important;
+}
 
 /* Tablet */
 @media (max-width: 767px) { 
