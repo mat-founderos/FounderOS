@@ -19,7 +19,7 @@
    width: 100%;
  }
 
-.hbspt-form input, .hbspt-form textarea, .hbspt-form select, .hsfc-TextInput{
+.hbspt-form input, .hbspt-form textarea, .hbspt-form select, .hsfc-TextInput, .email-mini-course-form---hubsspot .hs-form-field input{
     color: #fff!important;
     background-color: #fff0!important;
     border: 1px solid #878787!important;
@@ -98,7 +98,7 @@
  .hbspt-form fieldset.form-columns-0 {
     margin-bottom: -30px !important;
  }
- .hbspt-form .hs-button{
+ .hbspt-form .hs-button, .email-mini-course-form---hubsspot .hs-button{
     border: 1px solid var(--green-yellow)!important;
     background-color: var(--green-yellow)!important;
     color: var(--black)!important;
@@ -200,6 +200,28 @@ p.title {
    font-size: .85rem !important;
    font-weight: 400 !important;
 }
+
+.email-mini-course-form---hubsspot fieldset.form-columns-2 {
+   width: 100%;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 15px;
+}
+
+.email-mini-course-form---hubsspot .hs-form-field {
+   width: 100% !important;
+  margin-bottom:0!important;
+}
+
+.email-mini-course-form---hubsspot .hs-form-field .input, .hs-form-field .input input {
+   margin: 0 !important;
+   width: 100%;
+}
+
+
+
+
 /* Tablet */
 @media (max-width: 767px) { 
    .lead-magnet .text-field-form-workshop-hubspot, .system-audit-form .text-field-form-workshop-hubspot{
