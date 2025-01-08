@@ -219,7 +219,7 @@ p.title {
    width: 100%;
 }
 
-.email-mini-course-form---hubsspot .hbspt-form{
+.email-mini-course-form---hubsspot .hbspt-form form{
    gap: 15px!important;
 }
 .email-mini-course-form---hubsspot .actions, .email-mini-course-form---hubsspot .hs_submit{
