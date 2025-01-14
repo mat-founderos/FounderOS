@@ -35,7 +35,6 @@ $(document).ready(function() {
           hubspotField.val(fullNumber); // Update the value
           hubspotField.trigger("input"); // Trigger input event for dynamic updates
           hubspotField.trigger("change"); // Trigger change event to notify HubSpot
-          console.log("phone field updated");
         }
       
       }
