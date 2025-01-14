@@ -56,6 +56,9 @@
  ul.no-list.hs-error-msgs.inputs-list {
    position: absolute!important;
 }
+.hs_error_rollup ul.no-list.hs-error-msgs.inputs-list {
+   position: static !important;
+}
 
 .hbspt-form .input{
     margin:0!important;
