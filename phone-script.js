@@ -21,7 +21,16 @@ $(document).ready(function() {
         var formattedNumber = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
         input.value = formattedNumber;
         var countryCode = iti.getSelectedCountryData().dialCode;
-        $(".full-phone-input").val("+" + countryCode + input.value.replace(/^0/, ""));
+        if ($(".full-phone-input").length) {
+          $(".full-phone-input").val("+" + countryCode + input.value.replace(/^0/, ""));
+        }
+        if ($("input[name='mobilephone'].hs-input").length) {
+          $("input[name='mobilephone'].hs-input").val("+" + countryCode + input.value.replace(/^0/, ""));
+          console.log("mobilephone meron");
+        } else {
+          console.log("mobilephone wala")
+        }
+        
       }
 
       var form = $(input).closest('form');
