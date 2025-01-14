@@ -53,6 +53,10 @@
    align-items: flex-end!important;
  }
 
+ ul.no-list.hs-error-msgs.inputs-list {
+   position: absolute;
+}
+
 .hbspt-form .input{
     margin:0!important;
  }
