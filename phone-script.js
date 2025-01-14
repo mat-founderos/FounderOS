@@ -25,7 +25,7 @@ $(document).ready(function() {
           $(".full-phone-input").val("+" + countryCode + input.value.replace(/^0/, ""));
         }
         if ($("input[name='mobilephone'].hs-input").length) {
-          $("input[name='mobilephone'].hs-input").val("+" + countryCode + input.value.replace(/^0/, ""));
+          $("input[name='mobilephone'].hs-input").val(countryCode + input.value.replace(/^0/, ""));
           console.log("mobilephone meron");
         } else {
           console.log("mobilephone wala")
