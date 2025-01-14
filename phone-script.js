@@ -18,20 +18,29 @@ $(document).ready(function() {
       input.addEventListener('keyup', formatPhoneNumber);
 
       function formatPhoneNumber() {
+        // Format the phone number using intlTelInputUtils
         var formattedNumber = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
-        input.value = formattedNumber;
+        input.value = formattedNumber; // Update the input's visible value
+        
+        // Retrieve the country code
         var countryCode = iti.getSelectedCountryData().dialCode;
+      
+        // Update hidden input fields or other targets if they exist
         if ($(".full-phone-input").length) {
-          $(".full-phone-input").val("+" + countryCode + input.value.replace(/^0/, ""));
-        }
-        if ($("input[name='mobilephone'].hs-input").length) {
-          $("input[name='mobilephone'].hs-input").val(countryCode + input.value.replace(/^0/, ""));
-          console.log("mobilephone meron");
-        } else {
-          console.log("mobilephone wala")
+          $(".full-phone-input").val("+" + countryCode + formattedNumber.replace(/^0/, ""));
         }
         
+        if ($("input[name='mobilephone'].hs-input").length) {
+          $("input[name='mobilephone'].hs-input").val("+" + countryCode + formattedNumber.replace(/^0/, ""));
+          console.log("mobilephone field exists");
+        } else {
+          console.log("mobilephone field not found");
+        }
+        
+        // Log the final formatted number for debugging
+        console.log("Formatted number:", "+" + countryCode + formattedNumber.replace(/^0/, ""));
       }
+      
 
       var form = $(input).closest('form');
       form.submit(function() {
