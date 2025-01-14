@@ -50,7 +50,7 @@
  }
 
  .system-audit-form .hbspt-form fieldset{
-   align-items: flex-start!important;
+   align-items: flex-end!important;
  }
 
 .hbspt-form .input{
