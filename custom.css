@@ -54,7 +54,7 @@
  }
 
  ul.no-list.hs-error-msgs.inputs-list {
-   position: absolute;
+   position: absolute!important;
 }
 
 .hbspt-form .input{
