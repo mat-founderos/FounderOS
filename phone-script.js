@@ -30,14 +30,14 @@ $(document).ready(function() {
         }
       
         // Update HubSpot's phone field and trigger change event
-        if ($("input[name='mobilephone'].hs-input").length) {
+        if ($("input[name='phone'].hs-input").length) {
           var hubspotField = $("input[name='phone'].hs-input");
           hubspotField.val(fullNumber); // Update the value
           hubspotField.trigger("input"); // Trigger input event for dynamic updates
           hubspotField.trigger("change"); // Trigger change event to notify HubSpot
-          console.log("mobilephone field updated");
+          console.log("phone field updated");
         } else {
-          console.log("mobilephone field not found");
+          console.log("phone field not found");
         }
       
         console.log("Formatted phone number:", fullNumber); // Debugging log
