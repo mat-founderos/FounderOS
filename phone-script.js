@@ -36,11 +36,8 @@ $(document).ready(function() {
           hubspotField.trigger("input"); // Trigger input event for dynamic updates
           hubspotField.trigger("change"); // Trigger change event to notify HubSpot
           console.log("phone field updated");
-        } else {
-          console.log("phone field not found");
         }
       
-        console.log("Formatted phone number:", fullNumber); // Debugging log
       }
       
 
