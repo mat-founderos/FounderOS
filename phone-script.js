@@ -18,27 +18,29 @@ $(document).ready(function() {
       input.addEventListener('keyup', formatPhoneNumber);
 
       function formatPhoneNumber() {
-        // Format the phone number using intlTelInputUtils
         var formattedNumber = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
-        input.value = formattedNumber; // Update the input's visible value
+        input.value = formattedNumber; // Update the visible input value
         
-        // Retrieve the country code
         var countryCode = iti.getSelectedCountryData().dialCode;
+        var fullNumber = "+" + countryCode + input.value.replace(/^0/, "");
       
-        // Update hidden input fields or other targets if they exist
+        // Update any hidden input fields
         if ($(".full-phone-input").length) {
-          $(".full-phone-input").val("+" + countryCode + formattedNumber.replace(/^0/, ""));
+          $(".full-phone-input").val(fullNumber);
         }
-        
+      
+        // Update HubSpot's phone field and trigger change event
         if ($("input[name='mobilephone'].hs-input").length) {
-          $("input[name='mobilephone'].hs-input").val("+" + countryCode + formattedNumber.replace(/^0/, ""));
-          console.log("mobilephone field exists");
+          var hubspotField = $("input[name='mobilephone'].hs-input");
+          hubspotField.val(fullNumber); // Update the value
+          hubspotField.trigger("input"); // Trigger input event for dynamic updates
+          hubspotField.trigger("change"); // Trigger change event to notify HubSpot
+          console.log("mobilephone field updated");
         } else {
           console.log("mobilephone field not found");
         }
-        
-        // Log the final formatted number for debugging
-        console.log("Formatted number:", "+" + countryCode + formattedNumber.replace(/^0/, ""));
+      
+        console.log("Formatted phone number:", fullNumber); // Debugging log
       }
       
 
