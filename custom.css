@@ -248,7 +248,7 @@ p.title {
    flex-direction: column;
 }
 
-.hbspt-form .hs-dependent-field label span {
+.hbspt-form .hs-dependent-field .hs-form-checkbox label span {
    margin-left: 10px;
 }
 /* Tablet */
