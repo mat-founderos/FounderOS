@@ -236,6 +236,21 @@ p.title {
    display: none!important;
 }
 
+.hbspt-form .hs-dependent-field {
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
+.hbspt-form .hs-dependent-field ul.inputs-list.multi-container {
+   gap: 3px;
+   display: flex;
+   flex-direction: column;
+}
+
+.hbspt-form .hs-dependent-field label span {
+   margin-left: 10px;
+}
 /* Tablet */
 @media (max-width: 767px) { 
    .lead-magnet .text-field-form-workshop-hubspot, .system-audit-form .text-field-form-workshop-hubspot{
