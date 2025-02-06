@@ -25,6 +25,29 @@ section#wall-container .px-4 {
     padding: 0 !important;
 }
 
+button{
+    border: 1px solid #d9fc67;
+    background-color: #d9fc67;
+    color: var(--black);
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 4px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0;
+    padding: 12px 52px!important;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px!important;
+    font-weight: 700!important;
+    line-height: 1;
+    transition: all .2s;
+    display: flex;
+    position: relative;
+}
+button:hover {
+    color: #d9fc67;
+    background-color: #0000;
+}
 /* img.w-full.object-contain[alt="Video Poster"] {
     padding: 10px!important;
     border-radius: 7px !important;
