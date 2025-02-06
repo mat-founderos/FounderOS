@@ -20,9 +20,9 @@ button{
     align-items: center!important;
     margin-top: 0!important;
     padding: 12px 52px!important;
-    font-family: Arial, Helvetica Neue, Helvetica, sans-serif!important;
+    /* font-family: Arial, Helvetica Neue, Helvetica, sans-serif!important; */
     font-size: 14px!important;
-    font-weight: 700!important;
+    font-weight: 600!important;
     line-height: 1!important;
     transition: all .2s!important;
     display: flex!important;
