@@ -25,6 +25,10 @@ section#wall-container .px-4 {
     padding: 0 !important;
 }
 
+::slotted([q\\:slot="load-btn"]) section#wall-container .px-4 {
+    padding: 12px 52px !important;
+}
+
 button{
     border: 1px solid #d9fc67!important;
     background-color: #d9fc67!important;
