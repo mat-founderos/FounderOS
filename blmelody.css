@@ -12,7 +12,7 @@ body {
 button{
     border: 1px solid #d9fc67!important;
     background-color: #d9fc67!important;
-    color: var(--black)!important;
+    color: #000000!important;
     text-align: center!important;
     text-transform: uppercase!important;
     border-radius: 4px!important;
