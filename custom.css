@@ -251,6 +251,9 @@ p.title {
 .hbspt-form .hs-dependent-field .hs-form-checkbox label span {
    margin-left: 10px;
 }
+select option {
+   background: #000000 !important;
+}
 /* Tablet */
 @media (max-width: 767px) { 
    .lead-magnet .text-field-form-workshop-hubspot, .system-audit-form .text-field-form-workshop-hubspot{

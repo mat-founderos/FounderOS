@@ -1,61 +1,89 @@
-@font-face {
-    font-family: 'BLMelody-Light';
-    src: url('https://raw.githack.com/mat-founderos/FounderOS/main/BLMelody-Light.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
+/* @import url('http://example.com/example_style.css'); */
+
+/***********************************************/
+/* CSS @imports must be at the top of the file */
+/* Add them above this section                 */
+/***********************************************/
+
+/*****************************************/
+/* Start your style declarations here    */
+/*****************************************/
+.body-container-wrapper{
+    padding: 54px 0 64px !important;
+    align-items: flex-start;
 }
 
-body {
-    font-family: 'BLMelody-Light', sans-serif;
+.form-wrapper--subscription-preferences form input[type=checkbox]:checked{
+    background: url(https://44306052.fs1.hubspotusercontent-na1.net/hubfs/44306052/check-1.svg), transparent!important;
+    border: 1px solid #d9fc67;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+}
+.fakelabel input, .subscribe-options #globalunsub{
+    background: transparent;
+    }
+
+.system-logo {
+   margin: auto;
+   max-width: 100px;
+   padding: 0;
+   margin-top: 34px !important;
 }
 
-button{
-    border: 1px solid #d9fc67!important;
-    background-color: #d9fc67!important;
-    color: #000000!important;
-    text-align: center!important;
-    text-transform: uppercase!important;
-    border-radius: 4px!important;
-    justify-content: center!important;
-    align-items: center!important;
-    margin-top: 0!important;
-    padding: 12px 52px!important;
-    /* font-family: Arial, Helvetica Neue, Helvetica, sans-serif!important; */
-    font-size: 14px!important;
-    font-weight: 600!important;
-    line-height: 1!important;
-    transition: all .2s!important;
-    display: flex!important;
-    position: relative!important;
+.page-header p, h1{
+  font-family: sans-serif!important;
+  font-size:20px!important;
+  font-weight: 500;
 }
-button:hover {
-    color: #d9fc67!important;
-    background-color: #0000!important;
+body{
+  background: black;
+  color: white;
+}
+.system-logo img{
+   filter: invert(1);
 }
 
-p.title {
-    font-size: 13.5px !important;
-    font-weight: 300 !important;
-}
-span.underline.hover\:font-bold.cursor-pointer{
-    bottom: -4px !important;
+input#submitbutton {
+    border: 1px solid #d9fc67;
+    background-color: #d9fc67;
+    color: black;
+    text-align: center;
+    text-transform: uppercase;
+    border-radius: 4px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0;
+    margin-right: 0;
+    padding: 12px 52px;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    transition: all .2s;
+    display: flex;
     position: relative;
+}
+input#submitbutton:hover {
     color: #d9fc67;
-}
-.masonry-grid {
-    grid-template-columns: repeat(auto-fill, 350px) !important;
+    background-color: #0000;
 }
 
-section#wall-container .px-4 {
-    padding: 0 !important;
+form#email-prefs-form div#content {
+      background-color: #131313;
+    border: .5px solid #2e2e2e;
+    border-radius: 9px;
 }
-
-section#wall-container button.px-4 {
-    padding: 12px 52px!important;
+.success-image{
+filter: hue-rotate(-95deg);
 }
-
-/* img.w-full.object-contain[alt="Video Poster"] {
-    padding: 10px!important;
-    border-radius: 7px !important;
-    overflow: hidden;
-} */
+.fakelabel span {
+    font-weight: 500;
+}
+.hs_cos_wrapper_type_email_simple_subscription h1{
+    font-size: 45px !important;
+    line-height: 120% !important;
+}
+.hs_cos_wrapper_type_email_simple_subscription h1, .hs_cos_wrapper_type_email_simple_subscription h2, .hs_cos_wrapper_type_email_simple_subscription h3{
+text-align: center;
+}
