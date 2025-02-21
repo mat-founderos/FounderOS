@@ -1,9 +1,5 @@
 $(document).ready(function () {
-    function toggleField(checkboxSelector, fieldSelector) {
-        $(document).on("change", checkboxSelector, function () {
-            $(fieldSelector).toggle($(this).is(":checked"));
-        });
-    }
+    
     function handleFormSubmission(formClassName) {
         $(formClassName).submit(function (e) {
             e.preventDefault();
