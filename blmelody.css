@@ -87,3 +87,7 @@ filter: hue-rotate(-95deg);
 .hs_cos_wrapper_type_email_simple_subscription h1, .hs_cos_wrapper_type_email_simple_subscription h2, .hs_cos_wrapper_type_email_simple_subscription h3{
 text-align: center;
 }
+
+.star-ratings {
+    display: none !important;
+}
