@@ -64,6 +64,9 @@ input#submitbutton, #wall-container button{
     display: flex;
     position: relative;
 }
+#wall-container button{
+    margin-right: auto!important;
+}
 input#submitbutton:hover, #wall-container button:hover{
     color: #d9fc67;
     background-color: #0000;
