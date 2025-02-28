@@ -68,11 +68,19 @@ $(document).ready(function () {
 
 
     var iframe = $('iframe.testimonial-video-1')[0];
-    var iframeWindow = iframe.contentWindow;
-    // Check if the video player has an autoplay feature
-    iframe.onload = function() {
-        iframeWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-    };
+
+    if (iframe) { // Check if the iframe exists
+        iframe.onload = function () {
+            var iframeWindow = iframe.contentWindow;
+            if (iframeWindow) {
+                iframeWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            } else {
+                console.error("Iframe contentWindow is not accessible.");
+            }
+        };
+    } else {
+        console.error("Iframe with class .testimonial-video-1 not found.");
+    }
 
 
 });
