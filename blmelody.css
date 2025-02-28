@@ -44,7 +44,7 @@ body{
    filter: invert(1);
 }
 
-input#submitbutton {
+input#submitbutton, .load-btn button{
     border: 1px solid #d9fc67;
     background-color: #d9fc67;
     color: black;
@@ -64,7 +64,7 @@ input#submitbutton {
     display: flex;
     position: relative;
 }
-input#submitbutton:hover {
+input#submitbutton:hover, .load-btn button:hover{
     color: #d9fc67;
     background-color: #0000;
 }
