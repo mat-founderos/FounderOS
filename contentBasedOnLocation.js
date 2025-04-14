@@ -16,40 +16,49 @@ const optionCountries = [
   "bw", "ba", "bz", "by", "am"
 ];
 
-const headerTextElement = document.getElementById('home-header');
-
-function getCountryCode() {
-  return fetch('https://ipapi.co/country_code/')
-    .then(response => response.text())
-    .then(code => code.toLowerCase())
-    .catch(error => {
-      console.error('Error fetching country:', error);
-      return null;
-    });
-}
-
-async function updateHeaderText() {
-  const currentCode = await getCountryCode();
-  console.log('Current Country Code:', currentCode);
-
-  if (currentCode && mainCountries.includes(currentCode)) {
-    document.getElementById('main').style.display = 'block';
-    document.getElementById('down-sell').style.display = 'none';
-    document.getElementById('option').style.display = 'none';
-  } else if (currentCode && downSellCountries.includes(currentCode)) {
-    document.getElementById('main').style.display = 'none';
-    document.getElementById('down-sell').style.display = 'block';
-    document.getElementById('option').style.display = 'none';
-    headerTextElement.textContent = 'Down sell';
-  } else if (currentCode && optionCountries.includes(currentCode)) {
-    document.getElementById('main').style.display = 'none';
-    document.getElementById('down-sell').style.display = 'none';
-    document.getElementById('option').style.display = 'block';
-  } else {
-    document.getElementById('main').style.display = 'block';
-    document.getElementById('down-sell').style.display = 'none';
-    document.getElementById('option').style.display = 'none';
+async function getCountryCode() {
+  try {
+    const response = await fetch('https://ipinfo.io/country/');
+    return (await response.text()).toLowerCase();
+  } catch (error) {
+    console.error('Error fetching country:', error);
+    return null;
   }
 }
 
-updateHeaderText();
+async function hideAndShowElements(targetId, groupType) {
+  const currentCode = (await getCountryCode()).trim().toLowerCase();
+
+  console.log('User Country Code:', currentCode);
+
+  const show = () => {
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.style.display = 'block';
+    }
+  };
+  const hide = () => {
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.style.display = 'none';
+    }
+  };
+
+  if (!currentCode) return hide();
+
+  const isMain = mainCountries.includes(currentCode);
+  const isDownSell = downSellCountries.includes(currentCode);
+  const isOption = optionCountries.includes(currentCode);
+  
+if(isMain || isDownSell || isOption){
+  if (groupType === 'main' && isMain) show();
+  else if (groupType === 'down-sell' && isDownSell) show();
+  else if (groupType === 'option' && isOption) show();
+  else hide();
+}
+}
+
+hideAndShowElements("main", "main");
+hideAndShowElements("down-sell", "down-sell");
+hideAndShowElements("option", "option");
+
