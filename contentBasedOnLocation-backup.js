@@ -18,6 +18,9 @@ async function toggleElementByCountry(targetId, groupType) {
   const isMain = mainCountries.includes(currentCode);
   const isDownSell = downSellCountries.includes(currentCode);
   const isOption = optionCountries.includes(currentCode);
+  console.log(isMain);
+  console.log(isDownSell);
+  console.log(isOption);
   
 if(isMain || isDownSell || isOption){
   if (groupType === 'main' && isMain) show();
