@@ -45,6 +45,10 @@ async function updateHeaderText() {
     document.getElementById('main').style.display = 'none';
     document.getElementById('down-sell').style.display = 'none';
     document.getElementById('option').style.display = 'block';
+  } else {
+    document.getElementById('main').style.display = 'block';
+    document.getElementById('down-sell').style.display = 'none';
+    document.getElementById('option').style.display = 'none';
   }
 }
 
