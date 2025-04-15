@@ -21,7 +21,7 @@ async function getCountryCode() {
   }
 
   try {
-    const response = await fetch('https://ipinfo.io/country/');
+    const response = await fetch('https://ipinfo.io/country?token=5a76bf9a5f92a9');
     const country = (await response.text()).toLowerCase().trim();
 
     if (isValidCountryCode(country)) {
