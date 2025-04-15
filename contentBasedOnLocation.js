@@ -12,7 +12,7 @@ async function getCountryCode() {
   }
 }
 
-async function hideAndShowElements(targetId, groupType) {
+async function toggleElementByCountry(targetId, groupType) {
   const currentCode = (await getCountryCode()).trim().toLowerCase();
 
   console.log('User Country Code:', currentCode);
@@ -44,7 +44,7 @@ if(isMain || isDownSell || isOption){
 }
 }
 
-hideAndShowElements("header1", "main");
-hideAndShowElements("header2", "down-sell");
-hideAndShowElements("header3", "option");
+toggleElementByCountry("header1", "main");
+toggleElementByCountry("header2", "down-sell");
+toggleElementByCountry("header3", "option");
 
