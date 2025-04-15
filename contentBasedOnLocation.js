@@ -67,7 +67,4 @@ async function toggleElementByCountry(targetId, groupType) {
   }
 }
 
-// Usage
-toggleElementByCountry("header1", "main");
-toggleElementByCountry("header2", "down-sell");
-toggleElementByCountry("header3", "option");
+
