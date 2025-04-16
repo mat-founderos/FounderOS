@@ -68,3 +68,20 @@ async function toggleElementByCountry(targetId, groupType) {
 }
 
 
+async function getPageCategory() {
+  const currentCode = await getCountryCode();
+  const normalizedCode = currentCode?.toLowerCase();
+
+  if (mainCountries.includes(normalizedCode)) return 'Main';
+  if (downSellCountries.includes(normalizedCode)) return 'Down Sell';
+  if (optionCountries.includes(normalizedCode)) return 'Option';
+  return 'Main'; // Default to 'main' if not found
+}
+
+getPageCategory().then(category => {
+  //console.log(`The current page category is: ${category}`);
+  const formattedCategory = category === 'main' ? '' : ` (${category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())})`;
+  if (!document.title.includes(formattedCategory)) {
+    document.title += formattedCategory;
+  }
+});
