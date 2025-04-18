@@ -85,3 +85,4 @@ getPageCategory().then(category => {
     document.title += formattedCategory;
   }
 });
+ 
