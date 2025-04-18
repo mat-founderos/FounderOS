@@ -21,7 +21,7 @@ async function getCountryCode() {
   }
 
   try {
-    const response = await fetch('https://ipinfo.io/country/');
+    const response = await fetch('https://ipinfo.io/country?token=5a76bf9a5f92a9');
     const country = (await response.text()).toLowerCase().trim();
 
     if (isValidCountryCode(country)) {
@@ -42,7 +42,7 @@ async function getCountryCode() {
 function setElementVisibility(targetId, shouldShow) {
   const el = document.getElementById(targetId);
   if (!el) return;
-  el.style.display = shouldShow ? 'block' : 'none'; // Modify if using flex/grid
+  el.style.display = shouldShow ? 'block' : 'none'; 
 }
 
 async function toggleElementByCountry(targetId, groupType) {
@@ -54,7 +54,6 @@ async function toggleElementByCountry(targetId, groupType) {
   const isDownSell = downSellCountries.includes(normalizedCode);
   const isOption = optionCountries.includes(normalizedCode);
 
-  // If country is in one of the lists, apply visibility logic
   if (isMain || isDownSell || isOption) {
     setElementVisibility(targetId,
       (groupType === 'main' && isMain) ||
@@ -62,12 +61,25 @@ async function toggleElementByCountry(targetId, groupType) {
       (groupType === 'option' && isOption)
     );
   } else {
-    // Default fallback: show only 'main'
     setElementVisibility(targetId, groupType === 'main');
   }
 }
+  
+  
+async function getPageCategory() {
+  const currentCode = await getCountryCode();
+  const normalizedCode = currentCode?.toLowerCase();
 
-// Usage
-toggleElementByCountry("header1", "main");
-toggleElementByCountry("header2", "down-sell");
-toggleElementByCountry("header3", "option");
+  if (mainCountries.includes(normalizedCode)) return 'Main';
+  if (downSellCountries.includes(normalizedCode)) return 'Down Sell';
+  if (optionCountries.includes(normalizedCode)) return 'Option';
+  return 'Main'; 
+}
+
+getPageCategory().then(category => {
+  const formattedCategory = category === 'main' ? '' : ` (${category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())})`;
+  if (!document.title.includes(formattedCategory)) {
+    document.title += formattedCategory;
+  }
+});
+ 
