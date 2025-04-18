@@ -66,8 +66,8 @@ async function toggleElementByCountry(targetId, groupType) {
     setElementVisibility(targetId, groupType === 'main');
   }
 }
-
-
+  
+  
 async function getPageCategory() {
   const currentCode = await getCountryCode();
   const normalizedCode = currentCode?.toLowerCase();
