@@ -159,7 +159,7 @@ $(document).ready(function () {
 
 
   function openModal() {
-    document.querySelector('.modal-wrapper').style.display = 'block';
+    document.querySelector('.modal-wrapper').style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
 
@@ -171,7 +171,7 @@ $(document).ready(function () {
 
   document.addEventListener('click', function(e) {
     if (e.target.closest('.application-open')) {
-      document.querySelectorAll('.appplication-form-modal').forEach(m => m.style.display = 'block');
+      document.querySelectorAll('.appplication-form-modal').forEach(m => m.style.display = 'flex');
       document.body.style.overflow = 'hidden';
     }
     if (e.target.closest('.application-close')) {
