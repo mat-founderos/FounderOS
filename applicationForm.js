@@ -1,5 +1,6 @@
+let currentStep = 0;
 $(document).ready(function () {
-  let currentStep = 0;
+
   const steps = $(".multistep-form-step"),
     progressBar = $(".multistep-form-progressbar-progress"),
     totalSteps = steps.length;
@@ -111,6 +112,10 @@ $(document).ready(function () {
       changeStep(1);
     }
   });
+
+  $('#first-question-no').on('click', function() {
+    window.location.href = '/training';
+});
   
 
   showStep();
@@ -196,12 +201,24 @@ $(document).ready(function () {
     }
   });
 
-  $(window).on("beforeunload", function() {
-    if (window.fathom) {
-      const eventName = `Application Form Submit (Step: ${currentStep + 1})`;
-      fathom.trackEvent(eventName);
-    }
-  });
+  $(window).on("beforeunload", function (e) {
+    console.log("Beforeunload triggered");
+    fetch("https://hooks.zapier.com/hooks/catch/18964090/2pixxxp/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        name: $("input[name='Full-Name']").val()?.trim(),
+        email: $("input[name='Email']").val()?.trim(),
+        phone: $("input[name='phone']").val()?.trim(),
+      }).toString()
+    });
   
+    console.log("Fetch fired instead of beacon");
+  });
 
+  
+  
+ 
 });
