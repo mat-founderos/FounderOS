@@ -4,11 +4,6 @@ $(document).ready(function () {
     progressBar = $(".multistep-form-progressbar-progress"),
     totalSteps = steps.length;
 
-    if (window.fathom && currentStep === 0) {
-      const eventName = `Application Form Submit (Step: 1)`;
-      fathom.trackEvent(eventName);
-    }
-
   function updateProgress() {
     progressBar.css("width", `${((currentStep + 1) / totalSteps) * 100}%`);
   }
