@@ -105,8 +105,13 @@ $(document).ready(function () {
   $(".multistep-form-previous").click(() => changeStep(-1));
 
   $(".multistep-choice").change(function () {
-    changeStep(1);
+    if ($("#first-question-no").is(":checked")) {
+      window.location.href = "/training";
+    } else {
+      changeStep(1);
+    }
   });
+  
 
   showStep();
   updateProgress();
