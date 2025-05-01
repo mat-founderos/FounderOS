@@ -26,7 +26,7 @@ $(document).ready(function () {
     });
   }
 
-  const webhookURL = "https://founderos.app.n8n.cloud/webhook-test/b82aaa3a-642a-41ce-a02f-22e8d93bbd11";
+  const webhookURL = "https://founderos.app.n8n.cloud/webhook/webhook/partial-lead";
 
   async function a() {
     c();
@@ -114,7 +114,11 @@ $(document).ready(function () {
   $(".multistep-form-modal").submit(function (t) {
     t.preventDefault();
     c();
-    let e = encodeURIComponent(currentFormData["Full-Name"] || "");
+    let fullName = (currentFormData["Full-Name"] || "").trim();
+    let [firstName, ...rest] = fullName.split(" ");
+    let lastName = rest.join(" ");
+    let e = encodeURIComponent(firstName);
+    let l = encodeURIComponent(lastName);
     let o = encodeURIComponent(currentFormData.Email || "");
     let n = encodeURIComponent(currentFormData.phone || "");
     let r = false;
@@ -124,8 +128,9 @@ $(document).ready(function () {
       }
     });
     let i = r ? "/intro-call" : "/call";
-    window.location.href = `${i}?firstname=${e}&phone=${n}&email=${o}`;
+    window.location.href = `${i}?firstname=${e}&lastname=${l}&phone=${n}&email=${o}`;
   });
+  
   document.querySelectorAll(".multistep-choice-checkbox input").forEach(t => {
     t.addEventListener("change", () => {
       const e = t.closest(".multistep-choice-checkbox");
@@ -157,7 +162,7 @@ $(document).ready(function () {
       $(".multistep-form-next-modal ").click();
     }
     if (t.key === "Escape") {
-      document.querySelector(".modal-wrapper").style.display = "none";
+      document.querySelector(".appplication-form-modal").style.display = "none";
       document.body.style.overflow = "";
     }
   });
