@@ -8,43 +8,43 @@
 /*****************************************/
 /* Start your style declarations here    */
 /*****************************************/
-.body-container-wrapper{
+#wall-container .body-container-wrapper{
     padding: 54px 0 64px !important;
     align-items: flex-start;
 }
 
-.form-wrapper--subscription-preferences form input[type=checkbox]:checked{
+#wall-container .form-wrapper--subscription-preferences form input[type=checkbox]:checked{
     background: url(https://44306052.fs1.hubspotusercontent-na1.net/hubfs/44306052/check-1.svg), transparent!important;
     border: 1px solid #d9fc67;
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: contain !important;
 }
-.fakelabel input, .subscribe-options #globalunsub{
+#wall-container .fakelabel input, .subscribe-options #globalunsub{
     background: transparent;
     }
 
-.system-logo {
+#wall-container .system-logo {
    margin: auto;
    max-width: 100px;
    padding: 0;
    margin-top: 34px !important;
 }
 
-.page-header p, h1{
+#wall-container .page-header p, #wall-container h1{
   font-family: sans-serif!important;
   font-size:20px!important;
   font-weight: 500;
 }
-body{
+#wall-container body{
   background: black;
   color: white;
 }
-.system-logo img{
+#wall-container .system-logo img{
    filter: invert(1);
 }
 
-input#submitbutton, #wall-container button{
+#wall-container input#submitbutton, #wall-container button{
     border: 1px solid #d9fc67;
     background-color: #d9fc67;
     color: black;
@@ -67,30 +67,30 @@ input#submitbutton, #wall-container button{
 #wall-container button{
     margin-right: auto!important;
 }
-input#submitbutton:hover, #wall-container button:hover{
+#wall-container input#submitbutton:hover, #wall-container button:hover{
     color: #d9fc67;
     background-color: #0000;
 }
 
-form#email-prefs-form div#content {
+#wall-container form#email-prefs-form div#content {
       background-color: #131313;
     border: .5px solid #2e2e2e;
     border-radius: 9px;
 }
-.success-image{
+#wall-container .success-image{
 filter: hue-rotate(-95deg);
 }
-.fakelabel span {
+#wall-container .fakelabel span {
     font-weight: 500;
 }
-.hs_cos_wrapper_type_email_simple_subscription h1{
+#wall-container .hs_cos_wrapper_type_email_simple_subscription h1{
     font-size: 45px !important;
     line-height: 120% !important;
 }
-.hs_cos_wrapper_type_email_simple_subscription h1, .hs_cos_wrapper_type_email_simple_subscription h2, .hs_cos_wrapper_type_email_simple_subscription h3{
+#wall-container .hs_cos_wrapper_type_email_simple_subscription h1, #wall-container .hs_cos_wrapper_type_email_simple_subscription h2, #wall-container .hs_cos_wrapper_type_email_simple_subscription h3{
 text-align: center;
 }
 
-.star-ratings {
+#wall-container .star-ratings {
     display: none !important;
 }
