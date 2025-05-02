@@ -112,8 +112,8 @@ $(document).ready(function () {
   i();
   r();
   $(".multistep-form-modal").submit(function (t) {
-    t.preventDefault();
     fathom.trackEvent("Application Form Submit");
+    t.preventDefault();
     c();
     let fullName = (currentFormData["Full-Name"] || "").trim();
     let [firstName, ...rest] = fullName.split(" ");
