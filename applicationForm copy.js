@@ -1,9 +1,15 @@
 let currentStep = 0;
 let currentFormData = {};
 $(document).ready(function () { 
-  function r() {
-    e.css("width", (currentStep + 1) / o * 100 + "%");
-  }
+    
+    function r() {
+        const progressPercent = (currentStep / (o - 1)) * 100; 
+        e.css("width", progressPercent + "%");
+        $(".multistep-progress-number").text((currentStep + 1) + "/" + o);
+        $(".multistep-progress-percent").text(Math.round(progressPercent) + "%");
+      }
+      
+      
   function i() {
     t.hide().eq(currentStep).show();
     $(".multistep-form-previous-modal").toggle(currentStep > 0);
@@ -39,59 +45,47 @@ $(document).ready(function () {
     }
   }
   async function l(e) {
-    let o = t.eq(currentStep);
-    if (e !== 1 || function (t) {
-      let e = t.find(".multiform-textfield");
-      let o = t.find("input[type='radio']");
-      let n = t.find("input[type='checkbox']");
-      let r = t.find("#Email");
-      let i = t.find("#Phone-Number");
-      let c = t.find(".multistep-form-error");
-      let a = true;
-      var l;
-      if (r.length) {
-        l = r.val().trim();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(l)) {
-          c.text("Please enter a valid email address.").show();
+    // Prevent moving to an invalid step
+    if (currentStep + e >= 0 && currentStep + e < o) {
+      let o = t.eq(currentStep);
+      if (e !== 1 || function (t) {
+        let r = t.find("#Email");
+        let i = t.find("#Phone-Number");
+        let c = t.find(".multistep-form-error");
+        let a = true;
+        var l;
+        if (r.length) {
+          l = r.val().trim();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(l)) {
+            c.text("Please enter a valid email address.").show();
+            a = false;
+          }
+        }
+        if (i.length && /[a-zA-Z]/.test(i.val().trim())) {
+          c.text("Phone number should not contain letters.").show();
           a = false;
         }
-      }
-      if (i.length && /[a-zA-Z]/.test(i.val().trim())) {
-        c.text("Phone number should not contain letters.").show();
-        a = false;
-      }
-      if (e.length && n.length) {
-        if (!e.val().trim() && !n.is(":checked")) {
-          c.text("Please fill out this field or check the box.").show();
-          a = false;
+       
+        if (a) {
+          c.hide();
         }
-      } else {
-        if (e.length && !e.val().trim()) {
-          c.text("Please fill out this field.").show();
-          a = false;
+        return a;
+      }(o)) {
+          currentStep += e;
+        
+          if (window.fathom) {
+            window.trackedSteps = window.trackedSteps || new Set();
+            if (!window.trackedSteps.has(currentStep)) {
+              const eventLabel = `Application Form Submit (Step: ${currentStep + 1})`;
+              fathom.trackEvent(eventLabel);
+              window.trackedSteps.add(currentStep);
+            }
+          }
+        
+          i();
+          r();
+          await a();
         }
-        if (n.length && !n.is(":checked")) {
-          c.text("Please select at least one to proceed.").show();
-          a = false;
-        }
-      }
-      if (o.length && !o.is(":checked")) {
-        c.text("Please select an option.").show();
-        a = false;
-      }
-      if (a) {
-        c.hide();
-      }
-      return a;
-    }(o)) {
-      currentStep += e;
-      if (window.fathom) {
-        const t = `Application Form Submit (Step: ${currentStep + 1})`;
-        fathom.trackEvent(t);
-      }
-      i();
-      r();
-      await a();
     }
   }
   const t = $(".multistep-form-step-modal ");
@@ -112,6 +106,7 @@ $(document).ready(function () {
   i();
   r();
   $(".multistep-form-modal").submit(function (t) {
+    fathom.trackEvent("Application Form Submit");
     t.preventDefault();
     c();
     let fullName = (currentFormData["Full-Name"] || "").trim();
@@ -168,9 +163,17 @@ $(document).ready(function () {
   });
   document.addEventListener("click", function (t) {
     if (t.target.closest(".application-open")) {
-      document.querySelectorAll(".appplication-form-modal").forEach(t => t.style.display = "flex");
-      document.body.style.overflow = "hidden";
-    }
+        document.querySelectorAll(".appplication-form-modal").forEach(t => t.style.display = "flex");
+        document.body.style.overflow = "hidden";
+        if (window.fathom) {
+          window.trackedSteps = window.trackedSteps || new Set();
+          if (!window.trackedSteps.has(0)) {
+            fathom.trackEvent("Application Form Submit (Step: 1)");
+            window.trackedSteps.add(0);
+          }
+        }
+      }
+      
     if (t.target.closest(".application-close")) {
       document.querySelectorAll(".appplication-form-modal").forEach(t => t.style.display = "none");
       document.body.style.overflow = "";
