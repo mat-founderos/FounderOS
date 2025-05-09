@@ -1,1 +1,183 @@
-document.addEventListener("DOMContentLoaded",(()=>{let e=[...document.querySelectorAll(".multistep-form-step")],t=document.querySelector(".multistep-form-progressbar-progress"),o=document.querySelector(".get-the-framework-modal"),a=document.querySelectorAll("#blurred-bg-close-gfm, #close-gfm"),r=0,l={},n="https://founderos.app.n8n.cloud/webhook/newsletter-partial";const d=()=>{t.style.width=(r+1)/e.length*100+"%"},s=()=>{document.querySelectorAll(".gfm-form input, .gfm-form select, .gfm-form textarea").forEach((e=>{const t=e.name||e.id;t&&("checkbox"===e.type?l[t]=e.checked:"radio"===e.type?e.checked&&(l[t]=e.value):l[t]=e.value.trim())}))},c=t=>{const o=e[r];([...o.querySelectorAll("input[required]")].every((e=>{const t=o.querySelector(`[data-error-for="${e.id}"]`);let a=!!e.value.trim(),r="";if(!a&&t?(t.textContent=r||"This field is required.",t.classList.remove("hide")):t&&t.classList.add("hide"),"email"===e.type){/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value.trim())||(a=!1,r="Please enter a valid email address.")}return a}))||1!==t)&&(e[r].style.display="none",r+=t,e[r].style.display="block",d(),window.fathom&&(window.trackedSteps=window.trackedSteps||new Set,window.trackedSteps.has(r)||(fathom.trackEvent(`Get Framework Modal (Step: ${r+1})`),window.trackedSteps.add(r))),(async()=>{s();try{await fetch(n,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"partial",formData:l,step:r,timestamp:(new Date).toISOString()})})}catch(e){console.error("Partial data send failed:",e)}})())};window.fathom&&fathom.trackEvent("Get Framework Modal (Step: 1)"),e.forEach(((e,t)=>{e.style.display=0===t?"block":"none",e.querySelector(".msf-button")?.addEventListener("click",(e=>{e.preventDefault(),c(1)})),e.querySelector(".msf-back-button")?.addEventListener("click",(e=>{e.preventDefault(),r>0&&c(-1)}))})),d(),a.forEach((e=>{e.addEventListener("click",(()=>{o&&(o.style.display="none",document.body.style.overflow="")}))})),document.addEventListener("keydown",(t=>{"Escape"===t.key&&o?(o.style.display="none",document.body.style.overflow=""):"Enter"===t.key&&(t.preventDefault(),r<e.length-1&&c(1))})),document.querySelectorAll(".gtf-cta").forEach((e=>{e.addEventListener("click",(()=>{const t=document.querySelector(".gfm-form");t&&(t.dataset.fathom=e.dataset.fathom,t.id=e.id),o&&(o.style.display="block"),console.log("Fathom value:",e.dataset.fathom)}))})),document.querySelectorAll(".gfm-form").forEach((e=>{let t=e.querySelector("#First-Name"),o=e.querySelector("#Email"),a=e.querySelector("#phone");e.addEventListener("submit",(e=>{e.preventDefault(),s(),fathom.trackEvent("Get Framework Modal Form Submit");let r=new URLSearchParams({email:o?.value||"",firstname:t?.value||"",phone:a?.value||""}).toString();window.location.href=`/thank-you-newsletter?${r}`}))})),window.addEventListener("beforeunload",(async()=>{s();try{await fetch(n,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"partial",formData:l,step:r,timestamp:(new Date).toISOString()}),keepalive:!0})}catch(e){console.error("Failed to send data before unload:",e)}}))}));
+document.addEventListener("DOMContentLoaded", () => {
+    let e = [...document.querySelectorAll(".multistep-form-step")],
+        t = document.querySelector(".multistep-form-progressbar-progress"),
+        o = document.querySelector(".get-the-framework-modal"),
+        r = document.querySelectorAll("#blurred-bg-close-gfm, #close-gfm"),
+        a = 0,
+        n = {},
+        l = "https://founderos.app.n8n.cloud/webhook/newsletter-partial";
+
+    const d = () => {
+        t.style.width = ((a + 1) / e.length) * 100 + "%";
+    };
+
+    const c = () => {
+        document.querySelectorAll(".gfm-form input, .gfm-form select, .gfm-form textarea").forEach((el) => {
+            const name = el.name || el.id;
+            if (name) {
+                if (el.type === "checkbox") {
+                    n[name] = el.checked;
+                } else if (el.type === "radio") {
+                    if (el.checked) n[name] = el.value;
+                } else {
+                    n[name] = el.value.trim();
+                }
+            }
+        });
+    };
+
+    const s = (stepChange) => {
+        const currentStep = e[a];
+        const inputsValid = [...currentStep.querySelectorAll("input[required]")].every((input) => {
+            const error = currentStep.querySelector(`[data-error-for="${input.id}"]`);
+            let isValid = !!input.value.trim();
+            let errorMessage = "";
+
+            if (!isValid && error) {
+                error.textContent = errorMessage || "This field is required.";
+                error.classList.remove("hide");
+            } else if (error) {
+                error.classList.add("hide");
+            }
+
+            if (input.type === "email") {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(input.value.trim())) {
+                    isValid = false;
+                    errorMessage = "Please enter a valid email address.";
+                }
+            }
+            return isValid;
+        });
+
+        if (inputsValid || stepChange !== 1) {
+            e[a].style.display = "none";
+            a += stepChange;
+            e[a].style.display = "block";
+            d();
+
+            if (window.fathom) {
+                window.trackedSteps = window.trackedSteps || new Set();
+                if (!window.trackedSteps.has(a)) {
+                    fathom.trackEvent(`Get Framework Modal (Step: ${a + 1})`);
+                    window.trackedSteps.add(a);
+                }
+            }
+
+            (async () => {
+                c();
+                try {
+                    await fetch(l, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            type: "partial",
+                            formData: n,
+                            step: a,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                } catch (err) {
+                    console.error("Partial data send failed:", err);
+                }
+            })();
+        }
+    };
+
+    e.forEach((step, index) => {
+        step.style.display = index === 0 ? "block" : "none";
+        step.querySelector(".msf-button")?.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            s(1);
+        });
+        step.querySelector(".msf-back-button")?.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            if (a > 0) s(-1);
+        });
+    });
+
+    d();
+
+    r.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            if (o) {
+                o.style.display = "none";
+                document.body.style.overflow = "";
+            }
+        });
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && o) {
+            o.style.display = "none";
+            document.body.style.overflow = "";
+        } else if (event.key === "Enter") {
+            event.preventDefault();
+            if (a < e.length - 1) {
+                s(1);
+            }
+        }
+    });
+
+    document.querySelectorAll(".gtf-cta").forEach((cta) => {
+        cta.addEventListener("click", () => {
+            const form = document.querySelector(".gfm-form");
+            if (form) {
+                form.dataset.fathom = cta.dataset.fathom;
+                form.id = cta.id;
+            }
+
+            if (o) {
+                o.style.display = "block";
+                console.log("Fathom value:", cta.dataset.fathom);
+
+                // Track Step 1 only when modal is opened the first time
+                if (window.fathom) {
+                    window.trackedSteps = window.trackedSteps || new Set();
+                    if (!window.trackedSteps.has(0)) {
+                        fathom.trackEvent("Get Framework Modal (Step: 1)");
+                        window.trackedSteps.add(0);
+                    }
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll(".gfm-form").forEach((form) => {
+        let firstName = form.querySelector("#First-Name"),
+            email = form.querySelector("#Email"),
+            phone = form.querySelector("#phone");
+
+        form.addEventListener("submit", (ev) => {
+            ev.preventDefault();
+            c();
+            fathom.trackEvent("Get Framework Modal Form Submit");
+
+            let query = new URLSearchParams({
+                email: email?.value || "",
+                firstname: firstName?.value || "",
+                phone: phone?.value || ""
+            }).toString();
+            window.location.href = `/thank-you-newsletter?${query}`;
+        });
+    });
+
+    window.addEventListener("beforeunload", async () => {
+        c();
+        try {
+            await fetch(l, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: "partial",
+                    formData: n,
+                    step: a,
+                    timestamp: new Date().toISOString()
+                }),
+                keepalive: true
+            });
+        } catch (err) {
+            console.error("Failed to send data before unload:", err);
+        }
+    });
+});

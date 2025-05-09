@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     let e = [...document.querySelectorAll(".multistep-form-step")],
         t = document.querySelector(".multistep-form-progressbar-progress"),
@@ -40,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (error) {
                 error.classList.add("hide");
             }
-        
+
             if (input.type === "email") {
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailPattern.test(input.value.trim())) {
@@ -50,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             return isValid;
         });
-        
 
         if (inputsValid || stepChange !== 1) {
             e[a].style.display = "none";
@@ -86,8 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    if (window.fathom) fathom.trackEvent("Get Framework Modal (Step: 1)");
-
     e.forEach((step, index) => {
         step.style.display = index === 0 ? "block" : "none";
         step.querySelector(".msf-button")?.addEventListener("click", (ev) => {
@@ -118,9 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (event.key === "Enter") {
             event.preventDefault();
             if (a < e.length - 1) {
-                s(1); // Go to next step
-            } else {
-             
+                s(1);
             }
         }
     });
@@ -132,8 +126,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 form.dataset.fathom = cta.dataset.fathom;
                 form.id = cta.id;
             }
-            if (o) o.style.display = "block";
-            console.log("Fathom value:", cta.dataset.fathom);
+
+            if (o) {
+                o.style.display = "block";
+                console.log("Fathom value:", cta.dataset.fathom);
+
+                // Track Step 1 only when modal is opened the first time
+                if (window.fathom) {
+                    window.trackedSteps = window.trackedSteps || new Set();
+                    if (!window.trackedSteps.has(0)) {
+                        fathom.trackEvent("Get Framework Modal (Step: 1)");
+                        window.trackedSteps.add(0);
+                    }
+                }
+            }
         });
     });
 
@@ -146,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ev.preventDefault();
             c();
             fathom.trackEvent("Get Framework Modal Form Submit");
+
             let query = new URLSearchParams({
                 email: email?.value || "",
                 firstname: firstName?.value || "",
