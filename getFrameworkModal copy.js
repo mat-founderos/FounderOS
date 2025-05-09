@@ -15,28 +15,73 @@ document.addEventListener("DOMContentLoaded", () => {
                 t && ("checkbox" === e.type ? (n[t] = e.checked) : "radio" === e.type ? e.checked && (n[t] = e.value) : (n[t] = e.value.trim()));
             });
         },
-        c = (t) => {
-            const o = e[a];
-            ([...o.querySelectorAll("input[required]")].every((e) => {
-                const t = o.querySelector(`[data-error-for="${e.id}"]`),
-                    r = !!e.value.trim();
-                return t?.classList.toggle("hide", r), r;
-            }) ||
-                1 !== t) &&
-                ((e[a].style.display = "none"),
-                (a += t),
-                (e[a].style.display = "block"),
-                d(),
-                window.fathom && ((window.trackedSteps = window.trackedSteps || new Set()), window.trackedSteps.has(a) || (fathom.trackEvent(`Get Framework Modal (Step: ${a + 1})`), window.trackedSteps.add(a))),
-                (async () => {
-                    s();
-                    try {
-                        await fetch(l, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "partial", formData: n, step: a, timestamp: new Date().toISOString() }) });
-                    } catch (e) {
-                        console.error("Partial data send failed:", e);
+        c = (stepChange) => {
+            const currentStep = e[a];
+        
+            const inputsValid = [...currentStep.querySelectorAll("input[required]")].every((input) => {
+                const error = currentStep.querySelector(`[data-error-for="${input.id}"]`);
+                let isValid = !!input.value.trim();
+                let errorMessage = "";
+        
+                if (input.type === "email") {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(input.value.trim())) {
+                        isValid = false;
+                        errorMessage = "Please enter a valid email address.";
                     }
-                })());
+                }
+        
+                if (!isValid && error) {
+                    error.textContent = errorMessage || "This field is required.";
+                    error.classList.remove("hide");
+                } else if (error) {
+                    error.classList.add("hide");
+                }
+        
+                return isValid;
+            });
+        
+            if (!inputsValid && stepChange === 1) return;
+        
+            // Hide current step
+            e[a].style.display = "none";
+        
+            // Move to next/previous step
+            a += stepChange;
+            e[a].style.display = "block";
+        
+            // Update progress bar
+            d();
+        
+            // Track step view with Fathom
+            if (window.fathom) {
+                window.trackedSteps = window.trackedSteps || new Set();
+                if (!window.trackedSteps.has(a)) {
+                    fathom.trackEvent(`Get Framework Modal (Step: ${a + 1})`);
+                    window.trackedSteps.add(a);
+                }
+            }
+        
+            // Send partial form data
+            (async () => {
+                s();
+                try {
+                    await fetch(l, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            type: "partial",
+                            formData: n,
+                            step: a,
+                            timestamp: new Date().toISOString(),
+                        }),
+                    });
+                } catch (error) {
+                    console.error("Partial data send failed:", error);
+                }
+            })();
         };
+        
     window.fathom && fathom.trackEvent("Get Framework Modal (Step: 1)"),
         e.forEach((e, t) => {
             (e.style.display = 0 === t ? "block" : "none"),

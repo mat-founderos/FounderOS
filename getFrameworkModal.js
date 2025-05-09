@@ -31,10 +31,26 @@ document.addEventListener("DOMContentLoaded", () => {
         const currentStep = e[a];
         const inputsValid = [...currentStep.querySelectorAll("input[required]")].every((input) => {
             const error = currentStep.querySelector(`[data-error-for="${input.id}"]`);
-            const isValid = !!input.value.trim();
-            if (error) error.classList.toggle("hide", isValid);
+            let isValid = !!input.value.trim();
+            let errorMessage = "";
+
+            if (!isValid && error) {
+                error.textContent = errorMessage || "This field is required.";
+                error.classList.remove("hide");
+            } else if (error) {
+                error.classList.add("hide");
+            }
+        
+            if (input.type === "email") {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(input.value.trim())) {
+                    isValid = false;
+                    errorMessage = "Please enter a valid email address.";
+                }
+            }
             return isValid;
         });
+        
 
         if (inputsValid || stepChange !== 1) {
             e[a].style.display = "none";
