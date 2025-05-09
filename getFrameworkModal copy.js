@@ -120,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 t && ((t.dataset.fathom = e.dataset.fathom), (t.id = e.id));
                 if (o) {
                     o.style.display = "block";
-                    console.log("Fathom value:", e.dataset.fathom);
                     
                     // Track Step 1 only when modal is opened
                     if (window.fathom) {

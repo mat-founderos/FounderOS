@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (o) {
                 o.style.display = "block";
-                console.log("Fathom value:", cta.dataset.fathom);
+                
 
                 // Track Step 1 only when modal is opened the first time
                 if (window.fathom) {
