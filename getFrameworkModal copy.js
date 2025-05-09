@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })();
         };
         
-    window.fathom && fathom.trackEvent("Get Framework Modal (Step: 1)"),
+    
         e.forEach((e, t) => {
             (e.style.display = 0 === t ? "block" : "none"),
                 e.querySelector(".msf-button")?.addEventListener("click", (e) => {
@@ -117,9 +117,22 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".gfm-cta-newsletter").forEach((e) => {
             e.addEventListener("click", () => {
                 const t = document.querySelector(".gfm-form-newsletter");
-                t && ((t.dataset.fathom = e.dataset.fathom), (t.id = e.id)), o && (o.style.display = "block"), console.log("Fathom value:", e.dataset.fathom);
+                t && ((t.dataset.fathom = e.dataset.fathom), (t.id = e.id));
+                if (o) {
+                    o.style.display = "block";
+                    console.log("Fathom value:", e.dataset.fathom);
+                    
+                    // Track Step 1 only when modal is opened
+                    if (window.fathom) {
+                        window.trackedSteps = window.trackedSteps || new Set();
+                        if (!window.trackedSteps.has(0)) {
+                            fathom.trackEvent("Get Framework Modal (Step: 1)");
+                            window.trackedSteps.add(0);
+                        }
+                    }
+                }
             });
-        }),
+        }) ,
         document.querySelectorAll(".gfm-form-newsletter").forEach((e) => {
             let t = e.querySelector("#First-Name"),
                 o = e.querySelector("#Email"),
