@@ -106,7 +106,7 @@ $(document).ready(function () {
   i();
   r();
   $(".multistep-form-modal").submit(function (t) {
-    fathom.trackEvent("Application Form Submit"); // Track form submission
+    fathom.trackEvent("Application Form Submit - Variant A"); // Track form submission
     t.preventDefault();
     c(); // Your existing tracking or cleanup logic
   
