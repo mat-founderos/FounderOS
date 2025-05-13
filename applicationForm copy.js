@@ -106,9 +106,10 @@ $(document).ready(function () {
   i();
   r();
   $(".multistep-form-modal").submit(function (t) {
-    fathom.trackEvent("Application Form Submit");
+    fathom.trackEvent("Application Form Submit"); // Track form submission
     t.preventDefault();
-    c();
+    c(); // Your existing tracking or cleanup logic
+  
     let fullName = (currentFormData["Full-Name"] || "").trim();
     let [firstName, ...rest] = fullName.split(" ");
     let lastName = rest.join(" ");
@@ -116,15 +117,24 @@ $(document).ready(function () {
     let l = encodeURIComponent(lastName);
     let o = encodeURIComponent(currentFormData.Email || "");
     let n = encodeURIComponent(currentFormData.phone || "");
-    let r = false;
-    $("input[type='radio']:checked").each(function () {
-      if ($(this).data("redirection") === "intro-call") {
-        r = true;
-      }
-    });
-    let i = r ? "/intro-call" : "/call";
+  
+    // Weighted routing logic: 0–64 goes to /intro-call (Setter), 65–99 goes to /call (Closer)
+    const roll = Math.floor(Math.random() * 100);
+    const r = roll < 65; // true = setter
+  
+    const i = r ? "/intro-call" : "/call";
+  
+    // Fathom tracking for redirection event
+    fathom.trackEvent(r ? "Redirect to Setter (Intro Call)" : "Redirect to Closer (Call)");
+  
+    // Optional: store outcome in localStorage
+    localStorage.setItem("bookingOutcome", r ? "setter" : "closer");
+  
+    // Redirect with query params
     window.location.href = `${i}?firstname=${e}&lastname=${l}&phone=${n}&email=${o}`;
   });
+  
+  
   
   document.querySelectorAll(".multistep-choice-checkbox input").forEach(t => {
     t.addEventListener("change", () => {
