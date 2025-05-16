@@ -120,7 +120,7 @@ $(document).ready(function () {
   
     // Weighted routing logic: 0–64 goes to /intro-call (Setter), 65–99 goes to /call (Closer)
     const roll = Math.floor(Math.random() * 100);
-    const r = roll < 65; // true = setter
+    const r = roll < 75; // true = setter
   
     const i = r ? "/intro-call" : "/call";
   
