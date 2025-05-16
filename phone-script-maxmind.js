@@ -77,7 +77,7 @@ $(document).ready(function () {
   }
 
   const phoneInputs = $('input[ms-code-phone-number]');
-  if (!phoneInputs.length) return;
+  // if (!phoneInputs.length) return;
 
   fetchCountryCode(); // Trigger fetch early
 
