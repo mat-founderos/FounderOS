@@ -11,6 +11,7 @@
 
 #wall-container span.underline:hover {
     background: #d9fc67;
+    font-weight: 400!important;
 }
 
 #wall-container .bg-black\/60,
