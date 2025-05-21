@@ -1,17 +1,28 @@
+/* Import Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+#wall-container {
+    font-family: 'Poppins', sans-serif;
+}
+
 #wall-container .star-ratings {
     display: none !important;
 }
+
 #wall-container span.underline:hover {
     background: #d9fc67;
 }
-#wall-container .bg-black\/60, .bg-black\/50 {
-    background: #ffffffc7!important;
+
+#wall-container .bg-black\/60,
+.bg-black\/50 {
+    background: #ffffffc7 !important;
     backdrop-filter: blur(1px);
 }
 
 #wall-container svg.w-7.h-7.text-gray-300.hover\:text-white.cursor-pointer {
     color: #161616;
 }
+
 #wall-container .testimonial-card {
     border-radius: 8px;
     box-shadow: 0 0 20px 0 #0000000d;
