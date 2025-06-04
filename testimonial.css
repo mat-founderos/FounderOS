@@ -28,3 +28,24 @@
     border-radius: 8px;
     box-shadow: 0 0 20px 0 #0000000d;
 }
+
+#wall-container button {
+    border: 1px solid #d9fc67;
+    background-color: #d9fc67;
+    font-family: Poppins, sans-serif;
+    color: #161616;
+    font-size: 14px;
+    line-height: 120%;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: .03px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    /* margin-top: 0; */
+    /* margin-right: 0; */
+    padding: 15px 40px;
+    transition: all .2s;
+    position: relative;
+    overflow: visible;
+}
