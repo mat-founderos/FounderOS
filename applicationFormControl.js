@@ -14,7 +14,7 @@ $(document).ready(function () {
             t && ($(this).is(":checkbox") ? (currentFormData[t] = $(this).prop("checked")) : $(this).is(":radio") ? $(this).prop("checked") && (currentFormData[t] = $(this).val()) : (currentFormData[t] = $(this).val().trim()));
         });
     }
-    const n = "webhook-here";
+    const n = "https://founderos.app.n8n.cloud/webhook/webhook/partial-lead";
     async function r() {
         o();
         try {
