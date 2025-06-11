@@ -133,26 +133,45 @@ $(document).ready(function () {
             $("#lastname").val(lastName);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const radios = document.querySelectorAll('input[type="radio"]');
-            const dynamicText = document.querySelector('.q2-dynamic');
+            window.addEventListener('load', function() {
+                const radios = document.querySelectorAll('input[type="radio"]');
+                const dynamicText = document.querySelector('.q2-dynamic');
+                const otherField = document.querySelector('input[name="What-s-the-1-bottleneck-in-your-business-right-now-Other"]');
 
-            const textMap = {
-                "The-business-needs-you-in-day-to-day-operations": "If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
-                "Revenue-has-plateaued-at-current-levels": "If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
-                "The-team-needs-you-for-every-decision": "If your team could make decisions without you, what could you accomplish in the next 90 days?",
-                "Lead-flow-is-unpredictable": "If you had consistent, predictable lead flow, what would that do for you and your business?",
-                "Profit-margins-are-too-low-for-the-effort": "If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
-            };
-
-            radios.forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                if (radio.checked && textMap[radio.id]) {
-                    dynamicText.textContent = textMap[radio.id];
+                if (!dynamicText) {
+                    console.error('Could not find .q2-dynamic element.');
+                    return;
                 }
-                });
-            });
-        });
 
+                const textMap = {
+                    "The-business-needs-you-in-day-to-day-operations": "If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
+                    "Revenue-has-plateaued-at-current-levels": "If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
+                    "The-team-needs-you-for-every-decision": "If your team could make decisions without you, what could you accomplish in the next 90 days?",
+                    "Lead-flow-is-unpredictable": "If you had consistent, predictable lead flow, what would that do for you and your business?",
+                    "Profit-margins-are-too-low-for-the-effort": "If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
+                };
+
+                // Listen to radio button changes
+                radios.forEach(function(radio) {
+                    radio.addEventListener('change', function() {
+                    console.log(`Radio clicked: ${radio.id}`);
+                    if (radio.checked && textMap[radio.id]) {
+                        dynamicText.textContent = textMap[radio.id];
+                        console.log(`Updated text to: ${textMap[radio.id]}`);
+                    }
+                    });
+                });
+
+                // Listen to changes in the otherField
+                if (otherField) {
+                    otherField.addEventListener('input', function() {
+                    console.log(`Other field value: ${otherField.value}`);
+                    if (otherField.value.trim() !== '') {
+                        dynamicText.textContent = "If your main challenge was solved, what could you achieve in the next 90 days?";
+                        console.log(`Updated text to: If your main challenge was solved, what could you achieve in the next 90 days?`);
+                    }
+                    });
+                }
+            });
 
 });
