@@ -144,11 +144,11 @@ $(document).ready(function () {
                 }
 
                 const textMap = {
-                    "The-business-needs-you-in-day-to-day-operations": "If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
-                    "Revenue-has-plateaued-at-current-levels": "If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
-                    "The-team-needs-you-for-every-decision": "If your team could make decisions without you, what could you accomplish in the next 90 days?",
-                    "Lead-flow-is-unpredictable": "If you had consistent, predictable lead flow, what would that do for you and your business?",
-                    "Profit-margins-are-too-low-for-the-effort": "If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
+                    "The-business-needs-you-in-day-to-day-operations": "8. If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
+                    "Revenue-has-plateaued-at-current-levels": "8. If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
+                    "The-team-needs-you-for-every-decision": "8. If your team could make decisions without you, what could you accomplish in the next 90 days?",
+                    "Lead-flow-is-unpredictable": "8. If you had consistent, predictable lead flow, what would that do for you and your business?",
+                    "Profit-margins-are-too-low-for-the-effort": "8. If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
                 };
 
                 // Listen to radio button changes
@@ -167,7 +167,7 @@ $(document).ready(function () {
                     otherField.addEventListener('input', function() {
                     console.log(`Other field value: ${otherField.value}`);
                     if (otherField.value.trim() !== '') {
-                        dynamicText.textContent = "If your main challenge was solved, what could you achieve in the next 90 days?";
+                        dynamicText.textContent = "8. If your main challenge was solved, what could you achieve in the next 90 days?";
                         console.log(`Updated text to: If your main challenge was solved, what could you achieve in the next 90 days?`);
                     }
                     });
