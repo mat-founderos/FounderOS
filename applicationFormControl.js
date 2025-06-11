@@ -133,4 +133,26 @@ $(document).ready(function () {
             $("#lastname").val(lastName);
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const radios = document.querySelectorAll('input[type="radio"]');
+            const dynamicText = document.querySelector('.q2-dynamic');
+
+            const textMap = {
+                "The-business-needs-you-in-day-to-day-operations": "If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
+                "Revenue-has-plateaued-at-current-levels": "If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
+                "The-team-needs-you-for-every-decision": "If your team could make decisions without you, what could you accomplish in the next 90 days?",
+                "Lead-flow-is-unpredictable": "If you had consistent, predictable lead flow, what would that do for you and your business?",
+                "Profit-margins-are-too-low-for-the-effort": "If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
+            };
+
+            radios.forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                if (radio.checked && textMap[radio.id]) {
+                    dynamicText.textContent = textMap[radio.id];
+                }
+                });
+            });
+        });
+
+
 });
