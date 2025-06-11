@@ -121,4 +121,16 @@ $(document).ready(function () {
             }
         }),
         (console.error = function () {});
+
+
+        $("#Full-Name").on("input", function () {
+            const fullName = $(this).val().trim();
+            const nameParts = fullName.split(" ");
+            const firstName = nameParts[0] || "";
+            const lastName = nameParts.slice(1).join(" ") || "";
+
+            $("#firstname").val(firstName);
+            $("#lastname").val(lastName);
+        });
+
 });
