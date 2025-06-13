@@ -234,6 +234,19 @@ function initMultistepForm(containerSelector) {
     // Initialize first step
     updateStep();
     updateProgress();
+
+    // Reusable function to sync textfield and radio group
+function setupOtherFieldSync(textFieldName, radioGroupName) {
+    container.find(`input[name="${textFieldName}"]`).on("input", function () {
+        const value = $(this).val().trim();
+        if (value !== '') {
+            container.find(`input[name="${radioGroupName}"]`).prop("checked", false);
+        }
+    });
+}
+setupOtherFieldSync("What-s-the-1-bottleneck-in-your-business-right-now-Other", "What-s-the-1-bottleneck-in-your-business-right-now");
+setupOtherFieldSync("What-type-of-business-do-you-run-Other", "What-type-of-business-do-you-run");
+
 }
 
 $(document).ready(function () {
