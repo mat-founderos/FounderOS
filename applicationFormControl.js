@@ -235,17 +235,27 @@ function initMultistepForm(containerSelector) {
     updateStep();
     updateProgress();
 
-    // Reusable function to sync textfield and radio group
-function setupOtherFieldSync(textFieldName, radioGroupName) {
-    container.find(`input[name="${textFieldName}"]`).on("input", function () {
-        const value = $(this).val().trim();
-        if (value !== '') {
-            container.find(`input[name="${radioGroupName}"]`).prop("checked", false);
-        }
-    });
-}
-setupOtherFieldSync("What-s-the-1-bottleneck-in-your-business-right-now-Other", "What-s-the-1-bottleneck-in-your-business-right-now");
-setupOtherFieldSync("What-type-of-business-do-you-run-Other", "What-type-of-business-do-you-run");
+    // Reusable function to sync textfield and radio group both ways
+    function setupOtherFieldSync(textFieldName, radioGroupName) {
+        const textField = container.find(`input[name="${textFieldName}"]`);
+        const radioGroup = container.find(`input[name="${radioGroupName}"]`);
+
+        // When typing into the text field, uncheck radio group
+        textField.on("input", function () {
+            const value = $(this).val().trim();
+            if (value !== '') {
+                radioGroup.prop("checked", false);
+            }
+        });
+
+        // When selecting any radio button, clear the text field
+        radioGroup.on("change", function () {
+            textField.val('');
+        });
+    }
+
+    setupOtherFieldSync("What-s-the-1-bottleneck-in-your-business-right-now-Other", "What-s-the-1-bottleneck-in-your-business-right-now");
+    setupOtherFieldSync("What-type-of-business-do-you-run-Other", "What-type-of-business-do-you-run");
 
 }
 
