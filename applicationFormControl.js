@@ -229,6 +229,8 @@ function initMultistepForm(containerSelector) {
         }
     });
 
+    $('.status').val('complete');
+
     // Initialize first step
     updateStep();
     updateProgress();
