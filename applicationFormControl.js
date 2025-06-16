@@ -263,8 +263,8 @@ $(document).ready(function () {
     initMultistepForm('.application-form-control');
     initMultistepForm('.application-form-variant-a');
 
-    // Auto-open form if hash is #appllication
-    if (window.location.hash === '#appllication') {
+    // Auto-open form if hash is #application
+    if (window.location.hash === '#application') {
         document.querySelectorAll(".appplication-form-modal").forEach(el => el.style.display = "flex");
         document.body.style.overflow = "hidden";
         window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
