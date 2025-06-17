@@ -260,15 +260,14 @@ function initMultistepForm(containerSelector) {
 }
 
 $(document).ready(function () {
-    // Combine firstname and lastname into Full-Name field, or use only firstname if lastname is missing
-    const urlParams = new URLSearchParams(window.location.search);
-    const firstName = urlParams.get("firstname");
-    const lastName = urlParams.get("lastname");
+    // Get values from input fields and combine
+    const firstName = $("[name='firstname']").val();
+    const lastName = $("[name='lastname']").val();
 
     if (firstName && lastName) {
-        $("#Full-Name").val(`${firstName} ${lastName}`).trigger("input");
+        $(".full-name").val(`${firstName} ${lastName}`).trigger("input");
     } else if (firstName) {
-        $("#Full-Name").val(firstName).trigger("input");
+        $(".full-name").val(firstName).trigger("input");
     }
 
     initMultistepForm('.application-form-control');
@@ -281,3 +280,4 @@ $(document).ready(function () {
         window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
     }
 });
+
