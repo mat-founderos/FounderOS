@@ -50,7 +50,7 @@
 
             // Only add error message once
             if ($form.find(".spam-error-message").length === 0) {
-              const $errorLabel = $(`<label class="spam-error-message" style="color: red; display: block; margin-bottom: 10px;">${error}</label>`);
+              const $errorLabel = $(`<label class="spam-error-message" style="color: red; display: block; margin-bottom: 10px; font-weight:normal;">${error}</label>`);
               $form.find(".form-disclaimer-checkbox").first().before($errorLabel);
             }
           }
