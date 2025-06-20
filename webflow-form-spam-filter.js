@@ -1,4 +1,4 @@
-function isSpammyInput(text) {
+ function isSpammyInput(text) {
     const lowercase = text.toLowerCase();
 
     if (text.length > 150) {
