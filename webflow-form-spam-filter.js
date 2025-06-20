@@ -1,63 +1,66 @@
+function isSpammyInput(text) {
+  const lowercase = text.toLowerCase();
 
-  function isSpammyInput(text) {
-    const lowercase = text.toLowerCase();
-
-    if (/(.)\1{5,}/.test(text)) {
-     return "Looks like your input has too many repeated characters.";
-    }
-
-    if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
-     return "Please check your response for missing spaces or typos.";
-    }
-
-    if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
-     return "Please use a personal or business email, not a temporary one.";
-    }
-
-    if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
-     return "Please avoid using random key patterns.";
-    }
-
-    return null;
+  if (text.length > 150) {
+    return "Your answer is too long. Please keep it concise.";
   }
 
-  // Wait for Webflow to load
-  window.addEventListener("DOMContentLoaded", function () {
-    $("form").each(function () {
-      const $form = $(this);
+  if (/(.)\1{5,}/.test(text)) {
+    return "Your answer contains repeated characters. Please revise it.";
+  }
 
-      $form.on("submit", function (e) {
-        let isSpamDetected = false;
+  if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
+    return "Please check your response for missing spaces or typos.";
+  }
 
-        // Clean previous errors
-        $form.find(".spam-error-message").remove();
-        $form.find(".spam-error").removeClass("spam-error");
+  if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
+    return "Please use a personal or business email, not a temporary one.";
+  }
 
-        const fields = $form.find("input:not([type='hidden']), textarea");
+  if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
+    return "Please avoid using random key patterns.";
+  }
 
-        fields.each(function () {
-          const $field = $(this);
-          const value = $field.val().trim();
-          const error = isSpammyInput(value);
+  return null;
+}
 
-          if (error) {
-            isSpamDetected = true;
-            $field.addClass("spam-error");
+document.addEventListener("DOMContentLoaded", function () {
+  const forms = document.querySelectorAll("form");
 
-            // Only add error message once
-            if ($form.find(".spam-error-message").length === 0) {
-              const $errorLabel = $(`<label class="spam-error-message" style="color: red; display: block; margin-bottom: 10px; font-weight:normal;">${error}</label>`);
-              $form.find(".form-disclaimer-checkbox").first().before($errorLabel);
-            }
-          }
-        });
+  forms.forEach(form => {
+    form.addEventListener("submit", function (e) {
+      let isSpamDetected = false;
+      let spamMessage = "";
 
-        if (isSpamDetected) {
-          e.preventDefault();        // block normal form submission
-          e.stopImmediatePropagation(); // block Webflow's AJAX submission
-          return false;              // explicitly stop further processing
+      const fields = form.querySelectorAll("input:not([type='hidden']), textarea");
+
+      fields.forEach(field => {
+        const value = field.value.trim();
+        const error = isSpammyInput(value);
+        if (error && !isSpamDetected) {
+          isSpamDetected = true;
+          spamMessage = error;
         }
       });
-    });
-  });
 
+      if (isSpamDetected) {
+        e.preventDefault();               // stops default form submit
+        e.stopImmediatePropagation();     // stops any later submit handlers (like the redirect)
+
+        // Remove existing spam message
+        const oldError = form.querySelector(".spam-error-message");
+        if (oldError) oldError.remove();
+
+        // Show spam error above disclaimer
+        const disclaimer = form.querySelector(".form-disclaimer-checkbox");
+        if (disclaimer) {
+          const errorLabel = document.createElement("label");
+          errorLabel.className = "spam-error-message";
+          errorLabel.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
+          errorLabel.textContent = spamMessage;
+          disclaimer.parentNode.insertBefore(errorLabel, disclaimer);
+        }
+      }
+    }, true); // <<<< VERY IMPORTANT: capture = true (runs before embed script)
+  });
+});
