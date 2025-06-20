@@ -36,8 +36,60 @@ function initMultistepForm(containerSelector) {
         });
     }
 
+    function isLikelySpam(formData) {
+    for (const [key, value] of Object.entries(formData)) {
+        if (key === "90-day-timeframe") continue;
+
+        const inputEl = container.find(`[name="${key}"], #${key}`);
+        const isHiddenField = inputEl.length && (
+            inputEl.attr("type") === "hidden" ||
+            !inputEl.is(":visible") ||
+            inputEl.css("opacity") === "0" ||
+            inputEl.css("display") === "none" ||
+            inputEl.css("visibility") === "hidden"
+        );
+
+        if (isHiddenField) continue;
+        if (typeof value !== "string") continue;
+
+        const text = value.trim();
+        const lowercase = text.toLowerCase();
+
+        if (text.length > 150) {
+            return { field: key, message: "Your answer is too long. Please keep it concise." };
+        }
+
+        if (/(.)\1{5,}/.test(text)) {
+            return { field: key, message: "Your answer contains repeated characters. Please revise it." };
+        }
+
+        if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
+            return { field: key, message: "Your answer seems unclear. Please check for typos." };
+        }
+
+        if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
+            return { field: key, message: "Temporary emails are not allowed. Please use a valid email." };
+        }
+
+        if (/asdf|sdfg|dfgh|fghj|ghjk|hjkl|qwer|zxcv/i.test(lowercase)) {
+            return { field: key, message: "Your answer looks auto-typed or random. Please revise it." };
+        }
+    }
+
+    return null;
+}
+
+
+
+
     async function sendPartial() {
-        collectFormData();
+    collectFormData();
+
+    if (isLikelySpam(currentFormData)) {
+        console.warn("Spam detected. Skipping partial submission.");
+        return;
+    }
+
         try {
             await fetch(endpoint, {
                 method: "POST",
@@ -54,31 +106,52 @@ function initMultistepForm(containerSelector) {
         }
     }
 
+
     function validateStep(stepElement) {
-        let isValid = true;
-        const emailInput = stepElement.find("#Email");
-        const phoneInput = stepElement.find("#Phone-Number");
-        const errorBox = stepElement.find(".multistep-form-error");
+    let isValid = true;
+    const emailInput = stepElement.find("#Email");
+    const phoneInput = stepElement.find("#Phone-Number");
+    const errorBox = stepElement.find(".multistep-form-error");
 
-        if (emailInput.length) {
-            const emailVal = emailInput.val().trim();
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-                errorBox.text("Please enter a valid email address.").show();
-                isValid = false;
-            }
+    errorBox.text("").hide();
+
+    if (emailInput.length) {
+        const emailVal = emailInput.val().trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            errorBox.text("Please enter a valid email address.").show();
+            return false;
         }
-
-        if (phoneInput.length) {
-            const phoneVal = phoneInput.val().trim();
-            if (/[a-zA-Z]/.test(phoneVal)) {
-                errorBox.text("Phone number should not contain letters.").show();
-                isValid = false;
-            }
-        }
-
-        if (isValid) errorBox.hide();
-        return isValid;
     }
+
+    if (phoneInput.length) {
+        const phoneVal = phoneInput.val().trim();
+        if (/[a-zA-Z]/.test(phoneVal)) {
+            errorBox.text("Phone number should not contain letters.").show();
+            return false;
+        }
+    }
+
+    collectFormData();
+    const spamResult = isLikelySpam(currentFormData);
+
+    if (spamResult) {
+        errorBox.text(spamResult.message).show();
+
+        // Optionally scroll to the offending field
+        const fieldEl = container.find(`[name="${spamResult.field}"], #${spamResult.field}`);
+        if (fieldEl.length) {
+            $('html, body').animate({ scrollTop: fieldEl.offset().top - 100 }, 400);
+            fieldEl.focus();
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
+
+
 
     async function goToStep(direction) {
         if (currentStep + direction >= 0 && currentStep + direction < totalSteps) {
