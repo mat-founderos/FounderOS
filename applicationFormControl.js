@@ -107,7 +107,7 @@ function isLikelySpam(formData) {
     }
 
 
-    function validateStep(stepElement) {
+ function validateStep(stepElement) {
     let isValid = true;
     const emailInput = stepElement.find("#Email");
     const phoneInput = stepElement.find("#Phone-Number");
@@ -135,20 +135,13 @@ function isLikelySpam(formData) {
     const spamResult = isLikelySpam(currentFormData);
 
     if (spamResult) {
-        errorBox.text(spamResult.message).show();
-
-        // Optionally scroll to the offending field
-        const fieldEl = container.find(`[name="${spamResult.field}"], #${spamResult.field}`);
-        if (fieldEl.length) {
-            $('html, body').animate({ scrollTop: fieldEl.offset().top - 100 }, 400);
-            fieldEl.focus();
-        }
-
+        errorBox.text(spamResult).show();
         return false;
     }
 
     return true;
 }
+
 
 
 
