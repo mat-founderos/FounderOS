@@ -1,13 +1,7 @@
 function isSpammyInput(text) {
   const lowercase = text.toLowerCase();
 
-       if (text.length > 150) {
-            return "Please keep your response under 150 characters.";
-        }
-
-        if (/(.)\1{5,}/.test(text)) {
-            return "Looks like your input has too many repeated characters.";
-        }
+       
         if (/([a-z]{3,})\1{2,}/i.test(text.replace(/[^a-z]/gi, ''))) {
             return "Your response appears to repeat too often.";
         }
