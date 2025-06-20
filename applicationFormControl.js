@@ -36,7 +36,7 @@ function initMultistepForm(containerSelector) {
         });
     }
 
-    function isLikelySpam(formData) {
+function isLikelySpam(formData) {
     for (const [key, value] of Object.entries(formData)) {
         if (key === "90-day-timeframe") continue;
 
@@ -56,23 +56,23 @@ function initMultistepForm(containerSelector) {
         const lowercase = text.toLowerCase();
 
         if (text.length > 150) {
-            return { field: key, message: "Your answer is too long. Please keep it concise." };
+            return "Please keep your response under 150 characters.";
         }
 
         if (/(.)\1{5,}/.test(text)) {
-            return { field: key, message: "Your answer contains repeated characters. Please revise it." };
+            return "Looks like your input has too many repeated characters. Try simplifying it.";
         }
 
         if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
-            return { field: key, message: "Your answer seems unclear. Please check for typos." };
+            return "Please check your response for missing spaces or typos.";
         }
 
         if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
-            return { field: key, message: "Temporary emails are not allowed. Please use a valid email." };
+            return "Please use a personal or business email, not a temporary one.";
         }
 
-        if (/asdf|sdfg|dfgh|fghj|ghjk|hjkl|qwer|zxcv/i.test(lowercase)) {
-            return { field: key, message: "Your answer looks auto-typed or random. Please revise it." };
+        if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
+            return "Please avoid using random key patterns. Enter a meaningful response.";
         }
     }
 

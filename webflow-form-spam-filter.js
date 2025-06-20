@@ -3,23 +3,23 @@
     const lowercase = text.toLowerCase();
 
     if (text.length > 150) {
-      return "Your answer is too long. Please keep it concise.";
+     return "Please keep your response under 150 characters.";
     }
 
     if (/(.)\1{5,}/.test(text)) {
-      return "Your answer contains repeated characters. Please revise it.";
+     return "Looks like your input has too many repeated characters. Try simplifying it.";
     }
 
     if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
-      return "Your answer seems unclear. Please check for typos.";
+     return "Please check your response for missing spaces or typos.";
     }
 
     if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
-      return "Temporary emails are not allowed. Please use a valid email.";
+     return "Please use a personal or business email, not a temporary one.";
     }
 
     if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
-      return "Your answer looks auto-typed or random. Please revise it.";
+     return "Please avoid using random key patterns. Enter a meaningful response.";
     }
 
     return null;
