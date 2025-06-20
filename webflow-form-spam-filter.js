@@ -1,4 +1,4 @@
-<script>
+
   function isSpammyInput(text) {
     const lowercase = text.toLowerCase();
 
@@ -64,4 +64,4 @@
       });
     });
   });
-</script>
+
