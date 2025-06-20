@@ -7,7 +7,7 @@
     }
 
     if (/(.)\1{5,}/.test(text)) {
-     return "Looks like your input has too many repeated characters. Try simplifying it.";
+     return "Looks like your input has too many repeated characters.";
     }
 
     if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
@@ -19,7 +19,7 @@
     }
 
     if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
-     return "Please avoid using random key patterns. Enter a meaningful response.";
+     return "Please avoid using random key patterns.";
     }
 
     return null;
