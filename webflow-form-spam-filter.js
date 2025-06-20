@@ -1,4 +1,5 @@
- function isSpammyInput(text) {
+
+  function isSpammyInput(text) {
     const lowercase = text.toLowerCase();
 
     if (text.length > 150) {
@@ -24,45 +25,43 @@
     return null;
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const forms = document.querySelectorAll("form");
+  // Wait for Webflow to load
+  window.addEventListener("DOMContentLoaded", function () {
+    $("form").each(function () {
+      const $form = $(this);
 
-    forms.forEach(function (form) {
-      form.addEventListener("submit", function (e) {
+      $form.on("submit", function (e) {
         let isSpamDetected = false;
 
-        // Remove previous error messages
-        form.querySelectorAll(".spam-error-message").forEach(el => el.remove());
-        form.querySelectorAll(".spam-error").forEach(el => el.classList.remove("spam-error"));
+        // Clean previous errors
+        $form.find(".spam-error-message").remove();
+        $form.find(".spam-error").removeClass("spam-error");
 
-        const fields = form.querySelectorAll("input:not([type='hidden']), textarea");
+        const fields = $form.find("input:not([type='hidden']), textarea");
 
-        fields.forEach(function (field) {
-          const value = field.value.trim();
+        fields.each(function () {
+          const $field = $(this);
+          const value = $field.val().trim();
           const error = isSpammyInput(value);
 
           if (error) {
             isSpamDetected = true;
-            field.classList.add("spam-error");
+            $field.addClass("spam-error");
 
-            if (!form.querySelector(".spam-error-message")) {
-              const errorLabel = document.createElement("label");
-              errorLabel.className = "spam-error-message";
-              errorLabel.style.color = "red";
-              errorLabel.style.fontWeight = "normal";
-              errorLabel.style.display = "block";
-              errorLabel.style.marginBottom = "10px";
-              errorLabel.textContent = error;
-
-              form.prepend(errorLabel);
+            // Only add error message once
+            if ($form.find(".spam-error-message").length === 0) {
+              const $errorLabel = $(`<label class="spam-error-message" style="color: red; display: block; margin-bottom: 10px;">${error}</label>`);
+              $form.find(".form-disclaimer-checkbox").first().before($errorLabel);
             }
           }
         });
 
         if (isSpamDetected) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
+          e.preventDefault();        // block normal form submission
+          e.stopImmediatePropagation(); // block Webflow's AJAX submission
+          return false;              // explicitly stop further processing
         }
       });
     });
   });
+
