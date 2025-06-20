@@ -1,25 +1,21 @@
 function isSpammyInput(text) {
   const lowercase = text.toLowerCase();
 
-  if (text.length > 150) {
-    return "Your answer is too long. Please keep it concise.";
-  }
+        if (/(.)\1{5,}/.test(text)) {
+            return "Looks like your input has too many repeated characters.";
+        }
 
-  if (/(.)\1{5,}/.test(text)) {
-    return "Your answer contains repeated characters. Please revise it.";
-  }
+        if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
+            return "Please check your response for missing spaces or typos.";
+        }
 
-  if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
-    return "Please check your response for missing spaces or typos.";
-  }
+        if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
+            return "Please use a personal or business email, not a temporary one.";
+        }
 
-  if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
-    return "Please use a personal or business email, not a temporary one.";
-  }
-
-  if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
-    return "Please avoid using random key patterns.";
-  }
+        if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
+            return "Please avoid using random key patterns.";
+        }
 
   return null;
 }
