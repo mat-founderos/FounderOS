@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    localStorage.removeItem("userCountryInfo");
+
+  
   // Helper to validate 2-letter lowercase country code
   function isValidCountryCode(code) {
     return /^[a-z]{2}$/.test(code);
@@ -19,7 +22,6 @@ $(document).ready(function () {
       console.warn("Invalid localStorage cache. Clearing.");
       localStorage.removeItem(cacheKey);
     }
-
     if (
       cached &&
       now - cached.timestamp < 86400000 &&
@@ -32,21 +34,19 @@ $(document).ready(function () {
       countryCodePromise = Promise.resolve(cached.code);
       return countryCodePromise;
     }
-
-    // Fallback value in case GeoIP fails
     const fallbackCountry = "us";
 
     countryCodePromise = new Promise((resolve) => {
       if (typeof geoip2 !== "undefined" && typeof geoip2.city === "function") {
-          geoip2.city(function (response) {
-            const ip = response?.traits?.ip_address;
-            if (ip && $('input[name="ip_address"]').length) {
-              $('input[name="ip_address"]').val(ip);
-              console.log("IP Address:", ip);
-            }
-          }, function (error) {
-            console.error("IP fetch failed:", error);
-          });
+        geoip2.city(function (response) {
+          const ip = response?.traits?.ip_address;
+          if (ip && $('input[name="ip_address"]').length) {
+            $('input[name="ip_address"]').val(ip);
+            console.log("IP Address:", ip);
+          }
+        }, function (error) {
+          console.error("IP fetch failed:", error);
+        });
 }
 
 
