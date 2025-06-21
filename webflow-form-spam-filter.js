@@ -21,6 +21,10 @@ function isSpammyInput(text, fieldName) {
   if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
     return "Please avoid using random key patterns.";
   }
+  if (/^[0-9]+@/.test(lowercase)) {
+    return "Please use a valid email address, not one made of only numbers.";
+  }
+
 
   return null;
 }

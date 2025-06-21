@@ -58,6 +58,9 @@ function isLikelySpam(formData) {
         if (text.length > 150) {
             return "Please keep your response under 150 characters.";
         }
+        if (/^[0-9]+@/.test(lowercase)) {
+            return "Please use a valid email address, not one made of only numbers.";
+        }
 
         if (/([a-z]{3,})\1{2,}/i.test(text.replace(/[^a-z]/gi, ''))) {
             return "Your response appears to repeat too often.";
