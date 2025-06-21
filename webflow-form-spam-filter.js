@@ -1,6 +1,10 @@
 function isSpammyInput(text) {
   const lowercase = text.toLowerCase();
 
+        // Length check only for firstname or lastname
+        if ((fieldName === "firstname" || fieldName === "lastname") && text.length > 100) {
+          return "Please keep your response concise.";
+        }
        
         if (/([a-z]{3,})\1{2,}/i.test(text.replace(/[^a-z]/gi, ''))) {
             return "Your response appears to repeat too often.";
