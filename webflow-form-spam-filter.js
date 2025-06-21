@@ -1,26 +1,26 @@
-function isSpammyInput(text) {
+function isSpammyInput(text, fieldName) {
   const lowercase = text.toLowerCase();
 
-        // Length check only for firstname or lastname
-        if ((fieldName === "firstname" || fieldName === "lastname") && text.length > 100) {
-          return "Please keep your response concise.";
-        }
-       
-        if (/([a-z]{3,})\1{2,}/i.test(text.replace(/[^a-z]/gi, ''))) {
-            return "Your response appears to repeat too often.";
-        }
+  // Length check only for firstname or lastname
+  if ((fieldName === "firstname" || fieldName === "lastname") && text.length > 100) {
+    return "Please keep your response concise.";
+  }
 
-        if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
-            return "Please check your response for missing spaces or typos.";
-        }
+  if (/([a-z]{3,})\1{2,}/i.test(text.replace(/[^a-z]/gi, ''))) {
+    return "Your response appears to repeat too often.";
+  }
 
-        if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
-            return "Please use a personal or business email, not a temporary one.";
-        }
+  if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
+    return "Please check your response for missing spaces or typos.";
+  }
 
-        if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
-            return "Please avoid using random key patterns.";
-        }
+  if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
+    return "Please use a personal or business email, not a temporary one.";
+  }
+
+  if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
+    return "Please avoid using random key patterns.";
+  }
 
   return null;
 }
@@ -37,7 +37,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       fields.forEach(field => {
         const value = field.value.trim();
-        const error = isSpammyInput(value);
+        const name = field.name || ""; // Use field.name to get the fieldName
+        const error = isSpammyInput(value, name);
+
         if (error && !isSpamDetected) {
           isSpamDetected = true;
           spamMessage = error;
@@ -45,23 +47,26 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (isSpamDetected) {
-        e.preventDefault();               // stops default form submit
-        e.stopImmediatePropagation();     // stops any later submit handlers (like the redirect)
+        e.preventDefault();               // Stop form submission
+        e.stopImmediatePropagation();     // Prevent further event handlers
 
-        // Remove existing spam message
+        // Remove existing spam error
         const oldError = form.querySelector(".spam-error-message");
         if (oldError) oldError.remove();
 
-        // Show spam error above disclaimer
+        // Show spam error above the disclaimer (or at the top if not found)
         const disclaimer = form.querySelector(".form-disclaimer-checkbox");
+        const errorLabel = document.createElement("label");
+        errorLabel.className = "spam-error-message";
+        errorLabel.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
+        errorLabel.textContent = spamMessage;
+
         if (disclaimer) {
-          const errorLabel = document.createElement("label");
-          errorLabel.className = "spam-error-message";
-          errorLabel.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
-          errorLabel.textContent = spamMessage;
           disclaimer.parentNode.insertBefore(errorLabel, disclaimer);
+        } else {
+          form.insertBefore(errorLabel, form.firstChild);
         }
       }
-    }, true); // <<<< VERY IMPORTANT: capture = true (runs before embed script)
+    }, true); // Use capture=true so it runs before third-party scripts
   });
 });
