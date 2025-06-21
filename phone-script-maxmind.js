@@ -37,11 +37,18 @@ $(document).ready(function () {
     const fallbackCountry = "us";
 
     countryCodePromise = new Promise((resolve) => {
-      if (typeof geoip2 === "undefined" || typeof geoip2.country !== "function") {
-        console.warn("geoip2 not available, using fallback:", fallbackCountry);
-        resolve(fallbackCountry);
-        return;
-      }
+      if (typeof geoip2 !== "undefined" && typeof geoip2.city === "function") {
+  geoip2.city(function (response) {
+    const ip = response?.traits?.ip_address;
+    if (ip && $('input[name="ip_address"]').length) {
+      $('input[name="ip_address"]').val(ip);
+      console.log("IP Address:", ip);
+    }
+  }, function (error) {
+    console.error("IP fetch failed:", error);
+  });
+}
+
 
       geoip2.country(
         (response) => {
@@ -140,7 +147,7 @@ $(document).ready(function () {
             intlTelInputUtils.numberFormat.INTERNATIONAL
           );
           input.value = fullNumber;
-          console.log("Submitted phone number:", fullNumber);
+          //console.log("Submitted phone number:", fullNumber);
         });
       }
     });
