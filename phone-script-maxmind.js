@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    //localStorage.removeItem("userCountryInfo");
+    localStorage.removeItem("userCountryInfo");
 
   
   // Helper to validate 2-letter lowercase country code
