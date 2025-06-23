@@ -29,7 +29,7 @@ $(document).ready(function () {
     ) {
       if ($('input[name="user_country_name"]').length && cached.name) {
         $('input[name="user_country_name"]').val(cached.name);
-        console.log("Country Name (cached): " + cached.name);
+        //console.log("Country Name (cached): " + cached.name);
       }
       countryCodePromise = Promise.resolve(cached.code);
       return countryCodePromise;
@@ -42,7 +42,7 @@ $(document).ready(function () {
           const ip = response?.traits?.ip_address;
           if (ip && $('input[name="ip_address"]').length) {
             $('input[name="ip_address"]').val(ip);
-            console.log("IP Address:", ip);
+           // console.log("IP Address:", ip);
           }
         }, function (error) {
           console.error("IP fetch failed:", error);
