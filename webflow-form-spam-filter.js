@@ -21,19 +21,40 @@ function isSpammyInput(text, fieldName) {
   if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
     return "Please avoid using random key patterns.";
   }
+
   if (/^[0-9]+@/.test(lowercase)) {
     return "Please use a valid email address, not one made of only numbers.";
   }
-
 
   return null;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   const forms = document.querySelectorAll("form");
+  const honeypotField = document.querySelector(".work-email");
 
+  // Honeypot live check – disables submit buttons if honeypot is typed into
+  if (honeypotField) {
+    honeypotField.addEventListener("input", function () {
+      if (honeypotField.value.length > 0) {
+        document.querySelectorAll('input[type="submit"]').forEach(function (btn) {
+          btn.disabled = true;
+        });
+      }
+    });
+  }
+
+  // Intercept submissions
   forms.forEach(form => {
     form.addEventListener("submit", function (e) {
+      const honeypot = form.querySelector(".work-email");
+      if (honeypot && honeypot.value.trim().length > 0) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        console.warn("Submission blocked by honeypot.");
+        return;
+      }
+
       let isSpamDetected = false;
       let spamMessage = "";
 
@@ -41,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       fields.forEach(field => {
         const value = field.value.trim();
-        const name = field.name || ""; // Use field.name to get the fieldName
+        const name = field.name || "";
         const error = isSpammyInput(value, name);
 
         if (error && !isSpamDetected) {
@@ -51,14 +72,14 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (isSpamDetected) {
-        e.preventDefault();               // Stop form submission
-        e.stopImmediatePropagation();     // Prevent further event handlers
+        e.preventDefault();
+        e.stopImmediatePropagation();
 
         // Remove existing spam error
         const oldError = form.querySelector(".spam-error-message");
         if (oldError) oldError.remove();
 
-        // Show spam error above the disclaimer (or at the top if not found)
+        // Create new error message
         const disclaimer = form.querySelector(".form-disclaimer-checkbox");
         const errorLabel = document.createElement("label");
         errorLabel.className = "spam-error-message";
@@ -71,6 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
           form.insertBefore(errorLabel, form.firstChild);
         }
       }
-    }, true); // Use capture=true so it runs before third-party scripts
+    }, true); // capture phase
   });
 });
