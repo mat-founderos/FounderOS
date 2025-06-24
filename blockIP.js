@@ -1,10 +1,3 @@
-// Add your blocked IPs here
-const blockedIPs = [
-  "49.145.0.161222", "196.154.140.101", "196.158.199.105", "87.228.238.114",
-  "36.255.185.225", "103.82.121.46", "180.252.194.133", "42.111.144.73",
-  "49.179.117.207", "84.90.205.251", "85.255.233.66", "38.248.89.229", "176.56.39.212"
-];
-
 function blockIfIPMatchesFromCache() {
   const cacheKey = "userCountryInfo";
   const now = Date.now();
@@ -13,8 +6,8 @@ function blockIfIPMatchesFromCache() {
   try {
     cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
   } catch (e) {
-    console.warn("Invalid localStorage cache. Clearing.");
-    localStorage.removeItem(cacheKey);
+    console.warn("Invalid localStorage cache. Skipping IP check.");
+    return; // Exit early without clearing the cache
   }
 
   const isFresh = cached && (now - cached.timestamp < 86400000); // 24 hours
@@ -53,7 +46,3 @@ function blockIfIPMatchesFromCache() {
     }
   }
 }
-
-$(document).ready(function () {
-  blockIfIPMatchesFromCache();
-});
