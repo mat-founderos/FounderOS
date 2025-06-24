@@ -1,5 +1,4 @@
 $(document).ready(function () {
-  // Helper to validate 2-letter lowercase country code
   function isValidCountryCode(code) {
     return /^[a-z]{2}$/.test(code);
   }
@@ -10,9 +9,9 @@ $(document).ready(function () {
     if (countryCodePromise) return countryCodePromise;
 
     const cacheKey = "userCountryInfo";
-    let cached = null;
     const now = Date.now();
 
+    let cached = null;
     try {
       cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
     } catch (e) {
@@ -28,28 +27,8 @@ $(document).ready(function () {
       if ($('input[name="user_country_name"]').length && cached.name) {
         $('input[name="user_country_name"]').val(cached.name);
       }
-
       if (cached.ip && $('input[name="ip_address"]').length) {
         $('input[name="ip_address"]').val(cached.ip);
-      }
-
-      // Patch: If IP is missing, fetch and update it
-      if (!cached.ip && typeof geoip2 !== "undefined" && typeof geoip2.city === "function") {
-        geoip2.city(
-          function (response) {
-            const ip = response?.traits?.ip_address || null;
-            if (ip) {
-              cached.ip = ip;
-              localStorage.setItem(cacheKey, JSON.stringify(cached));
-              if ($('input[name="ip_address"]').length) {
-                $('input[name="ip_address"]').val(ip);
-              }
-            }
-          },
-          function (error) {
-            console.error("IP fetch failed:", error);
-          }
-        );
       }
 
       countryCodePromise = Promise.resolve(cached.code);
@@ -73,7 +52,6 @@ $(document).ready(function () {
         if ($('input[name="user_country_name"]').length) {
           $('input[name="user_country_name"]').val(countryName);
         }
-
         if (ip && $('input[name="ip_address"]').length) {
           $('input[name="ip_address"]').val(ip);
         }
@@ -81,47 +59,34 @@ $(document).ready(function () {
         resolve(code);
       };
 
-      if (
-        typeof geoip2 !== "undefined" &&
-        typeof geoip2.city === "function"
-      ) {
-        geoip2.city(
-          function (response) {
+      if (typeof geoip2 !== "undefined" && typeof geoip2.country === "function") {
+        geoip2.country(
+          (response) => {
+            const code = response?.country?.iso_code?.toLowerCase?.() || null;
+            const countryName = response?.country?.names?.en || "";
             const ip = response?.traits?.ip_address || null;
-            if (ip && $('input[name="ip_address"]').length) {
-              $('input[name="ip_address"]').val(ip);
+
+            if (isValidCountryCode(code)) {
+              saveToCache(code, countryName, ip);
+            } else {
+              resolve(fallbackCountry);
             }
           },
-          function (error) {
-            console.error("IP fetch failed:", error);
-          }
-        );
-      }
-
-      geoip2.country(
-        (response) => {
-          const code = response?.country?.iso_code?.toLowerCase?.() || null;
-          const countryName = response?.country?.names?.en || "";
-          const ip = response?.traits?.ip_address || null;
-
-          if (isValidCountryCode(code)) {
-            saveToCache(code, countryName, ip);
-          } else {
+          (error) => {
+            console.error("GeoIP fetch failed:", error);
             resolve(fallbackCountry);
           }
-        },
-        (error) => {
-          console.error("GeoIP fetch failed:", error);
-          resolve(fallbackCountry);
-        }
-      );
+        );
+      } else {
+        resolve(fallbackCountry);
+      }
     });
 
     return countryCodePromise;
   }
 
   const phoneInputs = $('input[ms-code-phone-number]');
-  fetchCountryCode(); // Trigger fetch early
+  fetchCountryCode(); // Trigger early
 
   const initializedForms = new Set();
 
