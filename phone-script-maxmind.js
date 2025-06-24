@@ -29,8 +29,27 @@ $(document).ready(function () {
         $('input[name="user_country_name"]').val(cached.name);
       }
 
-      if ($('input[name="ip_address"]').length && cached.ip) {
+      if (cached.ip && $('input[name="ip_address"]').length) {
         $('input[name="ip_address"]').val(cached.ip);
+      }
+
+      // Patch: If IP is missing, fetch and update it
+      if (!cached.ip && typeof geoip2 !== "undefined" && typeof geoip2.city === "function") {
+        geoip2.city(
+          function (response) {
+            const ip = response?.traits?.ip_address || null;
+            if (ip) {
+              cached.ip = ip;
+              localStorage.setItem(cacheKey, JSON.stringify(cached));
+              if ($('input[name="ip_address"]').length) {
+                $('input[name="ip_address"]').val(ip);
+              }
+            }
+          },
+          function (error) {
+            console.error("IP fetch failed:", error);
+          }
+        );
       }
 
       countryCodePromise = Promise.resolve(cached.code);
@@ -62,8 +81,10 @@ $(document).ready(function () {
         resolve(code);
       };
 
-      // Fetch IP only if it's not already cached
-      if (typeof geoip2 !== "undefined" && typeof geoip2.city === "function" && (!cached || !cached.ip)) {
+      if (
+        typeof geoip2 !== "undefined" &&
+        typeof geoip2.city === "function"
+      ) {
         geoip2.city(
           function (response) {
             const ip = response?.traits?.ip_address || null;
@@ -77,7 +98,6 @@ $(document).ready(function () {
         );
       }
 
-      // Fetch country data
       geoip2.country(
         (response) => {
           const code = response?.country?.iso_code?.toLowerCase?.() || null;
