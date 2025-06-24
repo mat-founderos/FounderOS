@@ -1,127 +1,92 @@
-function isSpammyInput(text, fieldName) {
-  const lowercase = text.toLowerCase();
-
-  if ((fieldName === "firstname" || fieldName === "lastname") && text.length > 100) {
-    return "Please keep your response concise.";
-  }
-
-  if (/([a-z]{3,})\1{2,}/i.test(text.replace(/[^a-z]/gi, ''))) {
-    return "Your response appears to repeat too often.";
-  }
-
-  if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
-    return "Please check your response for missing spaces or typos.";
-  }
-
-  if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
-    return "Please use a personal or business email, not a temporary one.";
-  }
-
-  if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
-    return "Please avoid using random key patterns.";
-  }
-
-  if (/^[0-9]+@/.test(lowercase)) {
-    return "Please use a valid email address, not one made of only numbers.";
-  }
-
-  return null;
+function isSpammyInput(e, t) {
+  const o = e.toLowerCase();
+  return ("firstname" === t || "lastname" === t) && e.length > 100
+    ? "Please keep your response concise."
+    : /([a-z]{3,})\1{2,}/i.test(e.replace(/[^a-z]/gi, ""))
+    ? "Your response appears to repeat too often."
+    : /[bcdfghjklmnpqrstvwxyz]{6,}/i.test(e) && !/\s/.test(e)
+    ? "Please check your response for missing spaces or typos."
+    : /@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(o)
+    ? "Please use a personal or business email, not a temporary one."
+    : /asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(o)
+    ? "Please avoid using random key patterns."
+    : /^[0-9]+@/.test(o)
+    ? "Please use a valid email address, not one made of only numbers."
+    : null;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  const forms = document.querySelectorAll("form");
-  const honeypotField = document.querySelector(".work-email");
-  const spamWebhook = "https://founderos.app.n8n.cloud/webhook/spam-logger";
+document.addEventListener("DOMContentLoaded", (function () {
+  const e = document.querySelectorAll("form"),
+        t = document.querySelector(".work-email");
 
-  // Honeypot live check – disables submit buttons if honeypot is typed into
-  if (honeypotField) {
-    honeypotField.addEventListener("input", function () {
-      if (honeypotField.value.length > 0) {
-        document.querySelectorAll('input[type="submit"]').forEach(function (btn) {
-          btn.disabled = true;
-        });
-      }
-    });
-  }
+  t && t.addEventListener("input", (function () {
+    t.value.length > 0 && document.querySelectorAll('input[type="submit"]').forEach((function (e) {
+      e.disabled = !0;
+    }));
+  }));
 
-  forms.forEach(form => {
-    form.addEventListener("submit", function (e) {
-      const honeypot = form.querySelector(".work-email");
+  e.forEach((e => {
+    e.addEventListener("submit", (function (t) {
+      const o = e.querySelector(".work-email");
 
-      // If honeypot triggered
-      if (honeypot && honeypot.value.trim().length > 0) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+      if (o && o.value.trim().length > 0) {
+        t.preventDefault();
+        t.stopImmediatePropagation();
         console.warn("Submission blocked by honeypot.");
 
-        // Collect partial form data
-        const formData = {};
-        const fields = form.querySelectorAll("input, select, textarea");
-        fields.forEach(field => {
-          const name = field.name || field.id;
-          if (!name) return;
-
-          if (field.type === "checkbox") {
-            formData[name] = field.checked;
-          } else if (field.type === "radio") {
-            if (field.checked) formData[name] = field.value;
-          } else {
-            formData[name] = field.value.trim();
+        const o = {};
+        e.querySelectorAll("input, select, textarea").forEach((e => {
+          const t = e.name || e.id;
+          if (t) {
+            if (e.type === "checkbox") o[t] = e.checked;
+            else if (e.type === "radio") e.checked && (o[t] = e.value);
+            else o[t] = e.value.trim();
           }
-        });
+        }));
 
-        // Send to webhook
-        fetch(spamWebhook, {
+        fetch("https://founderos.app.n8n.cloud/webhook/spam-logger", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: "spam-detected",
-            timestamp: new Date().toISOString(),
-            formData
+            timestamp: (new Date).toISOString(),
+            formData: o
           })
-        }).then(() => {
-          console.info("Partial spam submission sent.");
-        }).catch(err => {
-          console.error("Failed to send spam data:", err);
-        });
+        })
+        .then(() => { console.info("Partial spam submission sent."); })
+        .catch((e => { console.error("Failed to send spam data:", e); }));
 
         return;
       }
 
-      let isSpamDetected = false;
-      let spamMessage = "";
+      let a = !1, n = "";
 
-      const fields = form.querySelectorAll("input:not([type='hidden']), textarea");
-      fields.forEach(field => {
-        const value = field.value.trim();
-        const name = field.name || "";
-        const error = isSpammyInput(value, name);
+      e.querySelectorAll("input:not([type='hidden']), textarea").forEach((e => {
+        const fieldName = e.name || "";
+        if (fieldName === "cf-turnstile-response") return;
 
-        if (error && !isSpamDetected) {
-          isSpamDetected = true;
-          spamMessage = error;
+        const t = isSpammyInput(e.value.trim(), fieldName);
+        if (t && !a) {
+          a = !0;
+          n = t;
         }
-      });
+      }));
 
-      if (isSpamDetected) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+      if (a) {
+        t.preventDefault();
+        t.stopImmediatePropagation();
 
-        const oldError = form.querySelector(".spam-error-message");
-        if (oldError) oldError.remove();
+        const o = e.querySelector(".spam-error-message");
+        if (o) o.remove();
 
-        const disclaimer = form.querySelector(".form-disclaimer-checkbox");
-        const errorLabel = document.createElement("label");
-        errorLabel.className = "spam-error-message";
-        errorLabel.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
-        errorLabel.textContent = spamMessage;
+        const a = e.querySelector(".form-disclaimer-checkbox"),
+              s = document.createElement("label");
+        s.className = "spam-error-message";
+        s.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
+        s.textContent = n;
 
-        if (disclaimer) {
-          disclaimer.parentNode.insertBefore(errorLabel, disclaimer);
-        } else {
-          form.insertBefore(errorLabel, form.firstChild);
-        }
+        a ? a.parentNode.insertBefore(s, a) : e.insertBefore(s, e.firstChild);
       }
-    }, true); // capture phase
-  });
-});
+    }), !0);
+  }));
+}));

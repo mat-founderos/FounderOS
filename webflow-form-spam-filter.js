@@ -16,31 +16,55 @@ function isSpammyInput(e, t) {
 }
 
 document.addEventListener("DOMContentLoaded", (function () {
-  const e = document.querySelectorAll("form"),
-        t = document.querySelector(".work-email");
+  const forms = document.querySelectorAll("form"),
+        honeypot = document.querySelector(".work-email");
 
-  t && t.addEventListener("input", (function () {
-    t.value.length > 0 && document.querySelectorAll('input[type="submit"]').forEach((function (e) {
-      e.disabled = !0;
-    }));
-  }));
+  // === Add Submission Timer ===
+  const formStartTime = Date.now();
 
-  e.forEach((e => {
-    e.addEventListener("submit", (function (t) {
-      const o = e.querySelector(".work-email");
+  // === Add JS Validation Token ===
+  const jsToken = document.createElement("input");
+  jsToken.type = "hidden";
+  jsToken.name = "js-check";
+  jsToken.value = "valid-js-token";
+  forms.forEach(form => form.appendChild(jsToken));
 
-      if (o && o.value.trim().length > 0) {
-        t.preventDefault();
-        t.stopImmediatePropagation();
+  // === Block Known Bad User Agents ===
+  const badAgents = ["curl", "python", "scrapy", "httpclient", "wget", "node"];
+  const ua = navigator.userAgent.toLowerCase();
+  if (badAgents.some(agent => ua.includes(agent))) {
+    console.warn("Blocked by User-Agent filter.");
+    document.body.innerHTML = ""; // Stop loading page content
+    return;
+  }
+
+  // Honeypot trigger disables submit button
+  if (honeypot) {
+    honeypot.addEventListener("input", function () {
+      if (honeypot.value.length > 0) {
+        document.querySelectorAll('input[type="submit"]').forEach((btn) => {
+          btn.disabled = true;
+        });
+      }
+    });
+  }
+
+  forms.forEach((form => {
+    form.addEventListener("submit", (function (event) {
+      // Check honeypot
+      const honeypotField = form.querySelector(".work-email");
+      if (honeypotField && honeypotField.value.trim().length > 0) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         console.warn("Submission blocked by honeypot.");
 
-        const o = {};
-        e.querySelectorAll("input, select, textarea").forEach((e => {
-          const t = e.name || e.id;
-          if (t) {
-            if (e.type === "checkbox") o[t] = e.checked;
-            else if (e.type === "radio") e.checked && (o[t] = e.value);
-            else o[t] = e.value.trim();
+        const formData = {};
+        form.querySelectorAll("input, select, textarea").forEach((el => {
+          const name = el.name || el.id;
+          if (name) {
+            if (el.type === "checkbox") formData[name] = el.checked;
+            else if (el.type === "radio") el.checked && (formData[name] = el.value);
+            else formData[name] = el.value.trim();
           }
         }));
 
@@ -50,43 +74,67 @@ document.addEventListener("DOMContentLoaded", (function () {
           body: JSON.stringify({
             type: "spam-detected",
             timestamp: (new Date).toISOString(),
-            formData: o
+            formData
           })
         })
         .then(() => { console.info("Partial spam submission sent."); })
-        .catch((e => { console.error("Failed to send spam data:", e); }));
+        .catch((err => { console.error("Failed to send spam data:", err); }));
 
         return;
       }
 
-      let a = !1, n = "";
+      // === Submission Timer check ===
+      const timeElapsed = (Date.now() - formStartTime) / 1000;
+      if (timeElapsed < 5) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        console.warn("Submission blocked: too fast.");
+        alert("Form submitted too quickly. Please take a moment before submitting.");
+        return;
+      }
 
-      e.querySelectorAll("input:not([type='hidden']), textarea").forEach((e => {
-        const fieldName = e.name || "";
+      // === JS Token Check ===
+    setTimeout(() => {
+        document.querySelectorAll("form").forEach(form => {
+            if (!form.querySelector('input[name="js-check"]')) {
+            const jsToken = document.createElement("input");
+            jsToken.type = "hidden";
+            jsToken.name = "js-check";
+            jsToken.value = "valid-js-token";
+            form.appendChild(jsToken);
+            }
+        });
+    }, 500); // delay 0.5s to ensure Webflow loaded the form
+
+
+      // === Input validation check ===
+      let foundSpam = false, message = "";
+      form.querySelectorAll("input:not([type='hidden']), textarea").forEach((el => {
+        const fieldName = el.name || "";
         if (fieldName === "cf-turnstile-response") return;
 
-        const t = isSpammyInput(e.value.trim(), fieldName);
-        if (t && !a) {
-          a = !0;
-          n = t;
+        const checkResult = isSpammyInput(el.value.trim(), fieldName);
+        if (checkResult && !foundSpam) {
+          foundSpam = true;
+          message = checkResult;
         }
       }));
 
-      if (a) {
-        t.preventDefault();
-        t.stopImmediatePropagation();
+      if (foundSpam) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
 
-        const o = e.querySelector(".spam-error-message");
-        if (o) o.remove();
+        const existingError = form.querySelector(".spam-error-message");
+        if (existingError) existingError.remove();
 
-        const a = e.querySelector(".form-disclaimer-checkbox"),
-              s = document.createElement("label");
-        s.className = "spam-error-message";
-        s.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
-        s.textContent = n;
+        const errorLabel = document.createElement("label");
+        errorLabel.className = "spam-error-message";
+        errorLabel.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
+        errorLabel.textContent = message;
 
-        a ? a.parentNode.insertBefore(s, a) : e.insertBefore(s, e.firstChild);
+        const insertBeforeEl = form.querySelector(".form-disclaimer-checkbox") || form.firstChild;
+        form.insertBefore(errorLabel, insertBeforeEl);
       }
-    }), !0);
+    }), true);
   }));
 }));
