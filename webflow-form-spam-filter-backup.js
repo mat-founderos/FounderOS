@@ -113,6 +113,7 @@ document.addEventListener("DOMContentLoaded", (function () {
         const fieldName = el.name || "";
         if (fieldName === "cf-turnstile-response") return;
         if (fieldName === "g-recaptcha-response") return;
+        
         const checkResult = isSpammyInput(el.value.trim(), fieldName);
         if (checkResult && !foundSpam) {
           foundSpam = true;
