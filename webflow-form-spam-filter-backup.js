@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", (function () {
       form.querySelectorAll("input:not([type='hidden']), textarea").forEach((el => {
         const fieldName = el.name || "";
         if (fieldName === "cf-turnstile-response") return;
-
+        if (fieldName === "g-recaptcha-response") return;
         const checkResult = isSpammyInput(el.value.trim(), fieldName);
         if (checkResult && !foundSpam) {
           foundSpam = true;
