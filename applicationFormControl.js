@@ -66,10 +66,6 @@ function isLikelySpam(formData) {
             return "Your response appears to repeat too often.";
         }
 
-        if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(text) && !/\s/.test(text)) {
-            return "Please check your response for missing spaces or typos.";
-        }
-
         if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
             return "Please use a personal or business email, not a temporary one.";
         }
