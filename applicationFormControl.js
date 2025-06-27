@@ -46,8 +46,10 @@ function isLikelySpam(formData) {
             !inputEl.is(":visible") ||
             inputEl.css("opacity") === "0" ||
             inputEl.css("display") === "none" ||
-            inputEl.css("visibility") === "hidden"
+            inputEl.css("visibility") === "hidden" ||
+            inputEl.hasClass("hide")
         );
+
 
         if (isHiddenField) continue;
         if (typeof value !== "string") continue;

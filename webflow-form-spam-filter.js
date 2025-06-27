@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }, 500);
       let a = false;
       let r = "";
-      e.querySelectorAll("input:not([type='hidden']), textarea").forEach(e => {
+      e.querySelectorAll("input:not([type='hidden']):not(.hide), textarea:not(.hide)").forEach(e => {
         const t = e.name || "";
         if (t === "cf-turnstile-response") {
           return;
