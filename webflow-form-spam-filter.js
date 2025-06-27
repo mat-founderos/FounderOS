@@ -89,18 +89,16 @@ document.addEventListener("DOMContentLoaded", function () {
       let r = "";
       e.querySelectorAll("input:not([type='hidden']):not(.hide), textarea:not(.hide)").forEach(e => {
         const t = e.name || "";
-        if (t === "cf-turnstile-response") {
-          return;
-        }
-        if (t === "g-recaptcha-response") {
-          return;
-        }
+        if (
+            ["cf-turnstile-response", "g-recaptcha-response", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "user_country_name"].includes(t)
+        ) return;
         const o = isSpammyInput(e.value.trim(), t);
         if (o && !a) {
-          a = true;
-          r = o;
+            a = true;
+            r = o;
         }
-      });
+        });
+
       if (a) {
         t.preventDefault();
         t.stopImmediatePropagation();

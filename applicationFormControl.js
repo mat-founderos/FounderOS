@@ -38,7 +38,18 @@ function initMultistepForm(containerSelector) {
 
 function isLikelySpam(formData) {
     for (const [key, value] of Object.entries(formData)) {
-        if (["90-day-timeframe", "cf-turnstile-response"].includes(key)) continue;
+        const excludedFields = [
+            "90-day-timeframe",
+            "cf-turnstile-response",
+            "utm_source",
+            "utm_medium",
+            "utm_campaign",
+            "utm_term",
+            "utm_content",
+            "user_country_name"
+            ];
+
+        if (excludedFields.includes(key)) continue;
         
         const inputEl = container.find(`[name="${key}"], #${key}`);
         const isHiddenField = inputEl.length && (
