@@ -102,8 +102,12 @@ document.addEventListener("DOMContentLoaded", function () {
         n.className = "spam-error-message";
         n.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
         n.textContent = r;
-        const a = e.querySelector(".form-disclaimer-checkbox") || e.firstChild;
-        e.insertBefore(n, a);
+        const a = e.querySelector(".form-disclaimer-checkbox");
+          if (a && e.contains(a)) {
+            e.insertBefore(n, a);
+          } else {
+            e.appendChild(n); // fallback: just append the error label at the end
+          }
       }
     }, true);
   });
