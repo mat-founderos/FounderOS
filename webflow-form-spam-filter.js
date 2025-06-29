@@ -103,10 +103,10 @@ document.addEventListener("DOMContentLoaded", function () {
         n.style.cssText = "color: red; display: block; margin-bottom: 10px; font-weight: normal;";
         n.textContent = r;
         const a = e.querySelector(".form-disclaimer-checkbox");
-          if (a && e.contains(a)) {
+          if (a && a.parentNode === e) {
             e.insertBefore(n, a);
           } else {
-            e.appendChild(n); // fallback: just append the error label at the end
+            e.appendChild(n);
           }
       }
     }, true);
