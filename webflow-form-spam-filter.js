@@ -29,15 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.innerHTML = "";
     return;
   }
-  if (t) {
-    t.addEventListener("input", function () {
-      if (t.value.length > 0) {
-        document.querySelectorAll('input[type="submit"]').forEach(e => {
-          e.disabled = true;
-        });
-      }
-    });
-  }
+  
   e.forEach(e => {
     e.addEventListener("submit", function (t) {
       const n = e.querySelector(".work-email");
