@@ -198,20 +198,9 @@ function isLikelySpam(formData) {
     });
 
     // Form Submit
-    // container.find(".multistep-form-modal").submit(function (e) {
-    //     e.preventDefault();
-    //     fathom.trackEvent("Application Form Submit - Control");
-    //     collectFormData();
-
-    //     let fullName = (currentFormData["Full-Name"] || "").trim();
-    //     let [firstName, ...lastParts] = fullName.split(" ");
-    //     let lastName = lastParts.join(" ");
-
-    //     const redirectUrl = `/schedule/intro-call?firstname=${encodeURIComponent(firstName)}&lastname=${encodeURIComponent(lastName)}&phone=${encodeURIComponent(currentFormData.phone || "")}&email=${encodeURIComponent(currentFormData.Email || "")}`;
-
-    //     localStorage.setItem("bookingOutcome", "setter");
-    //     window.location.href = redirectUrl;
-    // });
+    container.find(".multistep-form-modal").submit(function (e) {
+        fathom.trackEvent("Application Form Submit");
+    });
 
     // Checkbox background logic
     container.find(".multistep-choice-checkbox input").change(function () {
