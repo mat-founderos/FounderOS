@@ -71,7 +71,7 @@ function isLikelySpam(formData) {
         if (text.length > 150) {
             return "Please keep your response under 150 characters.";
         }
-        if (/^[0-9]+@/.test(lowercase)) {
+        if (/^[0-9]+@(?:gmail|yahoo|outlook)\./i.test(lowercase)) {
             return "Please use a valid email address, not one made of only numbers.";
         }
 
@@ -83,15 +83,13 @@ function isLikelySpam(formData) {
             return "Please use a personal or business email, not a temporary one.";
         }
 
-        if (/asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv/i.test(lowercase)) {
+        if (/^(asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv){1,2}$/i.test(lowercase)) {
             return "Please avoid using random key patterns.";
         }
     }
 
     return null;
 }
-
-
 
 
     async function sendPartial() {
