@@ -80,14 +80,14 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // New logic: block if user didn't interact or submitted too fast
-      const startTime = parseInt(form.dataset.startTime || "0", 10);
-      if (!startTime || (Date.now() - startTime < 3000)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        console.warn("Submission blocked: too fast.");
-        alert("Form submitted too quickly. Please take a moment before submitting.");
-        return;
-      }
+      // const startTime = parseInt(form.dataset.startTime || "0", 10);
+      // if (!startTime || (Date.now() - startTime < 3000)) {
+      //   event.preventDefault();
+      //   event.stopImmediatePropagation();
+      //   console.warn("Submission blocked: too fast.");
+      //   alert("Form submitted too quickly. Please take a moment before submitting.");
+      //   return;
+      // }
 
       // Safety: reinsert js-check if missing
       setTimeout(() => {
