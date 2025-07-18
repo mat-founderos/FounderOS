@@ -125,7 +125,7 @@ function initMultistepForm(containerSelector) {
 
   function validateStep(stepElement) {
     let isValid = true;
-    const emailInput = stepElement.find("#What-s-the-best-email-to-reach-you");
+    const emailInput = stepElement.find("#Email");
     const phoneInput = stepElement.find("#Phone-Number");
     const errorBox = stepElement.find(".multistep-form-error");
 
