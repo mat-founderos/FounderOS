@@ -232,6 +232,8 @@ function isLikelySpam(formData) {
         const dynamicText = container.find('.q2-dynamic');
         const otherField = container.find('input[name="What-s-the-1-bottleneck-in-your-business-right-now-Other"]');
 
+        dynamicText.text("8. If your main challenge was solved, what could you achieve in the next 90 days?");
+
         const textMap = {
             "The-business-needs-you-in-day-to-day-operations": "8. If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
             "Revenue-has-plateaued-at-current-levels": "8. If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
