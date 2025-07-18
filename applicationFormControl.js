@@ -227,7 +227,7 @@ function isLikelySpam(formData) {
     });
 
     // Dynamic question text logic
-    document.addEventListener("DOMContentLoaded", function () {
+    window.addEventListener("load", function () {
         const radios = container.find('input[type="radio"]');
         const dynamicText = container.find('.q2-dynamic');
         const otherField = container.find('input[name="What-s-the-1-bottleneck-in-your-business-right-now-Other"]');
