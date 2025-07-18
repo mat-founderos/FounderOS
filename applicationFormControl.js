@@ -240,31 +240,23 @@ function isLikelySpam(formData) {
             "Profit-margins-are-too-low-for-the-effort": "8. If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
         };
 
-        function updateDynamicText() {
-            const checkedRadio = radios.filter(":checked").attr("id");
-            const otherValue = otherField.val().trim();
-
-            if (otherValue !== "") {
-                dynamicText.text("8. If your main challenge was solved, what could you achieve in the next 90 days?");
-            } else if (checkedRadio && textMap[checkedRadio]) {
-                dynamicText.text(textMap[checkedRadio]);
-            } else {
-                dynamicText.text("8. If your main challenge was solved, what could you achieve in the next 90 days?");
-            }
-        }
-
         radios.each(function () {
-            $(this).change(updateDynamicText);
+            $(this).change(function () {
+                const id = this.id;
+                if (this.checked && textMap[id]) {
+                    dynamicText.text(textMap[id]);
+                }
+            });
         });
 
         if (otherField.length) {
-            otherField.on("input", updateDynamicText);
+            otherField.on("input", function () {
+                if (this.value.trim() !== '') {
+                    dynamicText.text("8. If your main challenge was solved, what could you achieve in the next 90 days?");
+                }
+            });
         }
-
-        // Trigger once on load to handle default state
-        updateDynamicText();
     });
-
 
     // Enter + Escape key handlers
     $(document).on("keydown", function (e) {
