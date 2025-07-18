@@ -227,36 +227,36 @@ function isLikelySpam(formData) {
     });
 
     // Dynamic question text logic
-    window.addEventListener("load", function () {
-        const radios = container.find('input[type="radio"]');
-        const dynamicText = container.find('.q2-dynamic');
-        const otherField = container.find('input[name="What-s-the-1-bottleneck-in-your-business-right-now-Other"]');
+    document.addEventListener("DOMContentLoaded", function () {
+    const container = $(document); // Make sure container is defined
+    const radios = container.find('input[type="radio"]');
+    const dynamicText = container.find('.q2-dynamic');
+    const otherField = container.find('input[name="What-s-the-1-bottleneck-in-your-business-right-now-Other"]');
 
-        const textMap = {
-            "The-business-needs-you-in-day-to-day-operations": "8. If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
-            "Revenue-has-plateaued-at-current-levels": "8. If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
-            "The-team-needs-you-for-every-decision": "8. If your team could make decisions without you, what could you accomplish in the next 90 days?",
-            "Lead-flow-is-unpredictable": "8. If you had consistent, predictable lead flow, what would that do for you and your business?",
-            "Profit-margins-are-too-low-for-the-effort": "8. If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
-        };
+    const textMap = {
+        "The-business-needs-you-in-day-to-day-operations": "8. If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
+        "Revenue-has-plateaued-at-current-levels": "8. If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
+        "The-team-needs-you-for-every-decision": "8. If your team could make decisions without you, what could you accomplish in the next 90 days?",
+        "Lead-flow-is-unpredictable": "8. If you had consistent, predictable lead flow, what would that do for you and your business?",
+        "Profit-margins-are-too-low-for-the-effort": "8. If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?"
+    };
 
-        radios.each(function () {
-            $(this).change(function () {
-                const id = this.id;
-                if (this.checked && textMap[id]) {
-                    dynamicText.text(textMap[id]);
-                }
-            });
-        });
-
-        if (otherField.length) {
-            otherField.on("input", function () {
-                if (this.value.trim() !== '') {
-                    dynamicText.text("8. If your main challenge was solved, what could you achieve in the next 90 days?");
-                }
-            });
+    radios.on("change", function () {
+        const id = this.id;
+        if (this.checked && textMap[id]) {
+            dynamicText.text(textMap[id]);
         }
     });
+
+    if (otherField.length) {
+        otherField.on("input", function () {
+            if (this.value.trim() !== '') {
+                dynamicText.text("8. If your main challenge was solved, what could you achieve in the next 90 days?");
+            }
+        });
+    }
+});
+
 
     // Enter + Escape key handlers
     $(document).on("keydown", function (e) {
