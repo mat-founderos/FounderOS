@@ -242,6 +242,13 @@ function initMultistepForm(containerSelector) {
   // Form Submit
   container.find(".multistep-form-modal").submit(function (e) {
     fathom.trackEvent("Application Form Submit");
+     fbq('track', 'Lead', {
+        utm_source: getUTMParam('utm_source'),
+        utm_medium: getUTMParam('utm_medium'),
+        utm_campaign: getUTMParam('utm_campaign'),
+        utm_term: getUTMParam('utm_term'),
+        utm_content: getUTMParam('utm_content')
+    });
   });
 
   // Checkbox background logic
