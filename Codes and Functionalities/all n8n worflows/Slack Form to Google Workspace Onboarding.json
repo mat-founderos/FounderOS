@@ -1,0 +1,316 @@
+{
+  "name": "Slack Form to Google Workspace Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 4
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1gyitAzB2SDGRoV9vL1ZvlZ4fUcawRUDNjTHfDzXqJ1Y",
+          "mode": "list",
+          "cachedResultName": "Onboarding Checklist and New Hire Info",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gyitAzB2SDGRoV9vL1ZvlZ4fUcawRUDNjTHfDzXqJ1Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1889746748,
+          "mode": "list",
+          "cachedResultName": "Slack New Hire Form Submits",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gyitAzB2SDGRoV9vL1ZvlZ4fUcawRUDNjTHfDzXqJ1Y/edit#gid=1889746748"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "be31a621-375a-46d8-83bc-7e5bd31d2ece",
+      "name": "New Hire Form Submitted",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "xhK4ddlGcxuMqHFw",
+          "name": "Google Sheets don@founderos.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "firstName": "={{ $('New Hire Form Submitted').item.json['First Name'] }}",
+        "lastName": "={{ $('New Hire Form Submitted').item.json['Last Name'] }}",
+        "password": "={{ $json.password }}",
+        "username": "={{ $json.username }}",
+        "domain": "founderos.com",
+        "additionalFields": {
+          "changePasswordAtNextLogin": false,
+          "phoneUi": {
+            "phoneValues": [
+              {
+                "type": "mobile",
+                "value": "={{ $('New Hire Form Submitted').item.json['Personal Mobile Number'] }}",
+                "primary": true
+              }
+            ]
+          },
+          "emailUi": {
+            "emailValues": [
+              {
+                "type": "home",
+                "address": "={{ $('New Hire Form Submitted').item.json['Personal EMail'] }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gSuiteAdmin",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "bbef26a1-8670-4ba6-8a13-24d084c48c3a",
+      "name": "Create Google Workspace User",
+      "retryOnFail": false,
+      "credentials": {
+        "gSuiteAdminOAuth2Api": {
+          "id": "r7R7mPjSEkz82dJ7",
+          "name": "Google Workspace Admin account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function generatePassword(length = 20) {\n  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}';\n  let password = '';\n  for (let i = 0; i < length; i++) {\n    password += charset.charAt(Math.floor(Math.random() * charset.length));\n  }\n  return password;\n}\n\nconst input = items[0].json;\n\n// Normalize names\nconst first = ($input.first().json['First Name'] || '').toLowerCase().trim();\nconst last = ($input.first().json['Last Name'] || '').toLowerCase().trim();\n\n// Output all normalized values\nreturn [\n  {\n    json: {\n      firstName: first,\n      lastName: last,\n      username: `${first}.${last}`,\n      password: generatePassword(20)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "0f685059-2542-4758-96ba-c7161c18d52c",
+      "name": "Generate Random Password Normalize Name"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('New Hire Form Submitted').item.json['Personal EMail'] }}",
+        "subject": "Your New Founder OS Google Workspace Account",
+        "message": "=<!DOCTYPE html>\n<html>\n  <body style=\"font-family: Verdana, sans-serif; font-size: 16px; color: #333;\">\n    \n    <h2 style=\"font-weight: bold; font-size: 22px;\">New Founder OS Email Account Created</h2>\n\n    <p>\n      Hi {{ $('New Hire Form Submitted').item.json['First Name'] }},\n    </p>\n\n    <p>\n      It's Don Robinson here from <strong>Founder OS</strong>. Welcome to our team. Your new Founder OS email has been generated automatically.\n    </p>\n\n    <p>\n      We use <strong>Chrome exclusively</strong> here at Founder OS to ensure our tech stack works without any glitches.\n    </p>\n\n    <p>\n      Follow this \n      <a href=\"https://support.google.com/chrome/answer/2364824?hl=en&co=GENIE.Platform%3DDesktop\" target=\"_blank\">\n        guide to create a new Chrome profile\n      </a>\n      using the credentials included below.\n    </p>\n\n    <p>\n        <strong>New Email:</strong> {{ $json.primaryEmail }}\n        <strong>New Password:</strong> {{ $('Generate Random Password Normalize Name').item.json.password }}\n    <p>\n      Then you can log in to Gmail with your new account.\n    </p>\n\n    <p>\n      Once you're logged in to Gmail, click this link: \n      <a href=\"https://join.slack.com/t/founderos/signup\" target=\"_blank\">\n        Join our Slack workspace\n      </a>. \n      Provided you're logged in with your new Founder OS account, you'll be able to join automagically.\n    </p>\n\n    <p>\n      Following these instructions exactly will get you right into our Slack account. You'll join <strong>#new-hires</strong> and the instructions will present themselves from there.\n    </p>\n\n    <p>\n      Welcome aboard and I’ll see you on the inside.\n    </p>\n\n    <p>\n      <strong>Don Robinson, COO</strong><br />\n      Founder OS\n    </p>\n\n  </body>\n</html>",
+        "options": {
+          "ccList": "don@founderos.com",
+          "senderName": "Don Robinson"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "8c11c54e-4a34-4c37-8da8-837cc7c35f71",
+      "name": "Gmail",
+      "webhookId": "c2d45909-9097-4d59-a9e8-fa1e46623efd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uzsBqUjkGnjMN74P",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.skool.com/groups/founder-os-mastermind/webhooks/39d2392f18154d4cad873d8b9a69c953?email={{ $('Create Google Workspace User').item.json.primaryEmail }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        -16
+      ],
+      "id": "1892fb63-c96b-42ad-9ded-eb2b23d087e9",
+      "name": "Skool - Mastermind"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.skool.com/groups/founder-os-plus/webhooks/80062995b9904f278f5ce3d3ec1a8987?email={{ $('Create Google Workspace User').item.json.primaryEmail }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1312,
+        -16
+      ],
+      "id": "d69efcf6-da43-4ff7-900d-129da77a080c",
+      "name": "Skool - OS+"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.skool.com/groups/founderos/webhooks/2818725599a54a28927e33438b8d3bf9?email={{ $('Create Google Workspace User').item.json.primaryEmail }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        -16
+      ],
+      "id": "bfd279b1-85de-4810-ab1b-da3d94f5385f",
+      "name": "Skool - OS Program"
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        -16
+      ],
+      "id": "870a7fad-e25c-47df-b3bd-5be360abe1b2",
+      "name": "Wait",
+      "webhookId": "a88084e2-19f7-4cd7-b56f-52f8eeafb226"
+    }
+  ],
+  "pinData": {
+    "Create Google Workspace User": [
+      {
+        "json": {
+          "kind": "admin#directory#user",
+          "id": "107260727063426400690",
+          "etag": "\"K9RP2oCoM3-xc8pHjNEPvlShcOlczDvIh41jWjlyo9U/BcW1tEFvBavX2siU-npN54s16FU\"",
+          "primaryEmail": "don.robinson@founderos.com",
+          "name": {
+            "givenName": "Don",
+            "familyName": "Robinson"
+          },
+          "isAdmin": false,
+          "isDelegatedAdmin": false,
+          "creationTime": "2025-05-16T08:56:04.000Z",
+          "emails": [
+            {
+              "address": "donlrobinson31@gmail.com",
+              "type": "home"
+            }
+          ],
+          "phones": [
+            {
+              "value": "7727732400",
+              "primary": true,
+              "type": "mobile"
+            }
+          ],
+          "customerId": "C02uotyom",
+          "orgUnitPath": "/",
+          "isMailboxSetup": false
+        }
+      }
+    ]
+  },
+  "connections": {
+    "New Hire Form Submitted": {
+      "main": [
+        [
+          {
+            "node": "Generate Random Password Normalize Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Random Password Normalize Name": {
+      "main": [
+        [
+          {
+            "node": "Create Google Workspace User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Workspace User": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skool - OS+": {
+      "main": [
+        [
+          {
+            "node": "Skool - Mastermind",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skool - OS Program": {
+      "main": [
+        [
+          {
+            "node": "Skool - OS+",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Skool - OS Program",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b593a92f-3f9b-4f19-9134-935bbb2b7fb6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3ae1f016b714a4bd5ab3dd9eecf35155cef7ffe768b468ebe00755b2ce1626cb"
+  },
+  "id": "XH0uJ4ZBOu4PqEcA",
+  "tags": []
+}

@@ -1,0 +1,232 @@
+{
+  "name": "Form Spam Submission (Honeypot)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "spam-logger",
+        "options": {
+          "allowedOrigins": "https://www.founderos.com,https://founder-os-white.webflow.io"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2557453e-a64c-466a-baf5-9b66a8eeac2b",
+      "name": "Webhook",
+      "webhookId": "32a5d831-a6d4-4c07-9d99-2add6f92ba45"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1GwbEn-Gtfev9HEvggATg7p1jq1qDl_kqbIR_tDrel6c",
+          "mode": "list",
+          "cachedResultName": "FOS Form Spam Submissions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GwbEn-Gtfev9HEvggATg7p1jq1qDl_kqbIR_tDrel6c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GwbEn-Gtfev9HEvggATg7p1jq1qDl_kqbIR_tDrel6c/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "First Name": "={{ $json.body.formData.firstname }}",
+            "Email": "={{ $json.body.formData.email }}{{ $json.body.formData.Email }}",
+            "Last Name": "={{ $json.body.formData.lastname }}",
+            "Phone": "={{ $json.body.formData.phone }}",
+            "IP": "={{ $json.headers['x-real-ip'] }}",
+            "Date": "={{ $json.body.timestamp }}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IP",
+              "displayName": "IP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        224,
+        0
+      ],
+      "id": "3f3a4acd-a039-4913-875b-51c1fa2d311b",
+      "name": "Google Sheets",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3JDHUz4TaVSLK9Ct",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "founderos.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Mobile Safari/537.36",
+            "content-length": "1591",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-US,en;q=0.9",
+            "cache-control": "no-cache",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "49.145.0.161",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PH",
+            "cf-ray": "9541aa226564509e-HKG",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "https://founder-os-white.webflow.io",
+            "pragma": "no-cache",
+            "priority": "u=1, i",
+            "referer": "https://founder-os-white.webflow.io/",
+            "sec-ch-ua": "\"Google Chrome\";v=\"137\", \"Chromium\";v=\"137\", \"Not/A)Brand\";v=\"24\"",
+            "sec-ch-ua-mobile": "?1",
+            "sec-ch-ua-platform": "\"Android\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "49.145.0.161, 162.158.114.15",
+            "x-forwarded-host": "founderos.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-24-5cd9cc5d7f-49f65",
+            "x-is-trusted": "yes",
+            "x-real-ip": "49.145.0.161"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "type": "spam-detected",
+            "timestamp": "2025-06-23T05:42:49.137Z",
+            "formData": {
+              "firstname": "Matthew3",
+              "lastname": "Calabia3",
+              "email": "matthew.calabia3@founderos.com",
+              "Disclaimer-2": true,
+              "utm_source": "",
+              "utm_medium": "",
+              "utm_campaign": "",
+              "utm_term": "",
+              "utm_content": "",
+              "user_country_name": "Philippines",
+              "phone": "",
+              "Data Contact Method": "asdasdasd",
+              "ip_address": "49.145.0.161",
+              "hutk": "",
+              "ipAddress": "",
+              "pageUri": "",
+              "pageId": "",
+              "pageName": "",
+              "0-1_utm_campaign": "",
+              "0-1_utm_content": "",
+              "0-1_utm_term": "",
+              "0-1_utm_source": "",
+              "0-1_utm_medium": "",
+              "cf-turnstile-response": "0.WZZ3tvO_LhjFxt3o1aNMMt3FwlK4vXp2vX3BwNtQeI15yQ_CEQqA_OhMytcS9GZm0pXh7i0FqC50Tj_hSVTAdUxP3JNaG2VG3-SkGsbz3N8AhihUUYJTUtRa83blX-YkZoggJXVyM28YhBXXsa5bBbL0pQDqMAi2_pejpZ_uJSwJNV8FU2l4xudEQsdmyTdCA5SB91hX3shEEbgN3nwsbZUqZPFF7QhnAdhsOw4LzsDtmk2ElCeigOww58zPASbDOeRkyBwMhopFrkWPwMD7p9_jYOuNs1e3_8cqAKf6O87D8cSkN66Z5TDqeg0H5xqXu3WhjP92KrFGUTJT_p4wVJ8RxlMA-b4lx7CWykA_6-3tcnDdKiFJ0lKM38Gc2C-bHz_mLKl8q6P6pbLP3m7v0fk3tlTrV7MT1JyH8fEQKnMk-_XC_s1a71RiUs2NrNDyUj4-Ht4IBYEL9rlU8LOvQez1vlGC10ti-ezcdpbx9Bm2d1A50hdvqEzGKivXGBHQET6HgqFT6TB9mIrIV1IeKbiFqpAsWqHnCT-Wic2UjneczFJ5swyPIT4_TKJcTGbZ4iMPcE8oFIqEd-K6pKm3c1LrpblmyikyKltDyZYU-HWrjjqmwTkzMevjKbXLbg6YztQEiaI__NA_BtGsjTIc5NTrCv3MoICW7KLPW3yse4hZIdWiRQqydeiroTw5_hmb5OXOv4SyniJZQLY6t9GrT6-XIJ_9MPJcu8gB9i3vfxlNoBwydn90veekY3HvG602c2n7Z07cdvTNqW21hq8wpovdcPd9vTCV_yemgd9JSo9Jt6CqJytDXx6CN5lVh5cHhFkmL-XsL7SPwvD8YuaqggIcg3EVbO9MBSfD9VUY80UkT7khiMeQpkjI5Fprt2nvPXeF5-_Y-yLc7BKfnxeA1kzZS_apAM8cvRLIocDk4Zw.-_zXyLzLTPeQavl5fUUb7A.1cbb25a8c63ea8bcfffe26aa727eca3053373af4e57962cb1e1c31f8ac032719"
+            }
+          },
+          "webhookUrl": "https://founderos.app.n8n.cloud/webhook/spam-logger",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "81227522-7c61-4da5-a7d1-70bc06ec771e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3ae1f016b714a4bd5ab3dd9eecf35155cef7ffe768b468ebe00755b2ce1626cb"
+  },
+  "id": "uY55hTwhgSCNFyZ0",
+  "tags": []
+}

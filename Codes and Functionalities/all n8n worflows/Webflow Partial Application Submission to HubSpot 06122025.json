@@ -1,0 +1,291 @@
+{
+  "name": "Webflow Partial Application Submission to HubSpot 06122025",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook/partial-submission",
+        "options": {
+          "allowedOrigins": "https://www.founderos.com,https://founder-os.webflow.io,https://founder-os-white.webflow.io,https://new.founderos.com"
+        }
+      },
+      "id": "70a33de3-ab32-4b54-9786-30fd6314175a",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -80
+      ],
+      "webhookId": "c91e2b8f-2444-418b-9ecd-e3fa05e414ff"
+    },
+    {
+      "parameters": {
+        "jsCode": "// === Configurable Settings ===\nconst settings = {\n  delimiter: \"; \",\n  enableLogging: true,\n  requireValidEmail: true\n};\n\n// === Extract Input ===\nconst formData = $input.first().json.body.formData || {};\nconst isoTimestamp = $input.first().json.body.timestamp || null;\nconst timestampLong = isoTimestamp ? new Date(isoTimestamp).getTime() : null;\n\n// === Get Email (handle both old and new field names) ===\nconst email = formData[\"What-s-the-best-email-to-reach-you\"] || formData.Email || \"\";\n\n// === Email Validation ===\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nif (settings.requireValidEmail && !emailRegex.test(email)) {\n  if (settings.enableLogging) {\n    console.warn(\"Invalid or missing email, skipping record:\", email);\n  }\n  return []; // Skip record if email is invalid\n}\n\n// === Apply 'Other' field logic ===\n// If \"Other\" has content, use it as the main value (likely user selected \"Other\" option)\nif (formData[\"What-s-holding-your-business-back-most-Other\"] && \n    formData[\"What-s-holding-your-business-back-most-Other\"].trim()) {\n  formData[\"What-s-holding-your-business-back-most\"] = \n    formData[\"What-s-holding-your-business-back-most-Other\"];\n}\n\nif (formData[\"Which-best-describes-your-business-model-Other\"] && \n    formData[\"Which-best-describes-your-business-model-Other\"].trim()) {\n  formData[\"Which-best-describes-your-business-model\"] = \n    formData[\"Which-best-describes-your-business-model-Other\"];\n}\n\n// === Check if all REQUIRED fields are completed ===\n// Supporting both old and new field names for backward compatibility\nconst requiredFields = {\n  email: formData[\"What-s-the-best-email-to-reach-you\"] || formData.Email,                           // 1. Email\n  fullName: formData[\"What-s-your-full-name\"] || formData[\"Full-Name\"],                            // 2. Full name\n  revenue: formData[\"What-was-your-business-s-total-revenue-last-month\"] ||                        // 4. Revenue\n           formData[\"How-much-revenue-did-your-business-generate-last-month\"],\n  bottleneck: formData[\"What-s-holding-your-business-back-most\"] ||                                // 5. Bottleneck\n              formData[\"What-s-holding-your-business-back-most-Other\"] ||\n              formData[\"What-s-the-1-bottleneck-in-your-business-right-now\"] ||\n              formData[\"What-s-the-1-bottleneck-in-your-business-right-now-Other\"],\n  businessType: formData[\"Which-best-describes-your-business-model\"] ||                            // 6. Business type\n                formData[\"Which-best-describes-your-business-model-Other\"] ||\n                formData[\"What-type-of-business-do-you-run\"] ||\n                formData[\"What-type-of-business-do-you-run-Other\"],\n  hoursPerWeek: formData[\"How-many-hours-are-you-currently-putting-into-the-business-weekly\"] ||   // 7. Hours per week\n                formData[\"How-many-hours-per-week-does-your-business-require-from-you\"]\n};\n\n// Check if all required fields have values\nconst fieldStatuses = Object.entries(requiredFields).map(([fieldName, value]) => ({\n  field: fieldName,\n  hasValue: !!(value && value.toString().trim() !== \"\"),\n  value: value || \"\"\n}));\n\nconst allFieldsCompleted = fieldStatuses.every(field => field.hasValue);\n\n// === Determine Status ===\nconst formReportedStatus = formData.status;\nconst calculatedStatus = allFieldsCompleted ? \"complete\" : \"partial\";\nconst finalStatus = calculatedStatus; // Always use our calculated status\n\n// === Extract additional metadata ===\nconst metadata = {\n  formStep: $input.first().json.body.step || 0,\n  ipAddress: formData.ip_address || formData.ipAddress || \"\",\n  userCountry: formData.user_country_name || \"\",\n  jsCheck: formData[\"js-check\"] || \"\",\n  device: $input.first().json.headers[\"sec-ch-ua-platform\"] || \"\",\n  browser: $input.first().json.headers[\"sec-ch-ua\"] || \"\"\n};\n\n// === Logging ===\nif (settings.enableLogging) {\n  console.log(\"=== Form Submission Analysis ===\");\n  console.log(\"Timestamp:\", new Date(isoTimestamp).toISOString());\n  console.log(\"Timestamp Long:\", timestampLong);\n  console.log(\"Form Step Reached:\", metadata.formStep);\n  console.log(\"Form Reported Status:\", formReportedStatus);\n  console.log(\"Calculated Status:\", calculatedStatus);\n  console.log(\"Final Status:\", finalStatus);\n  console.log(\"\\n=== Field Completion Status ===\");\n  fieldStatuses.forEach(({ field, hasValue }) => {\n    console.log(`${field}: ${hasValue ? \"✓\" : \"✗\"}`);\n  });\n  console.log(\"\\n=== Metadata ===\");\n  console.log(\"IP Address:\", metadata.ipAddress);\n  console.log(\"Country:\", metadata.userCountry);\n  console.log(\"JS Check:\", metadata.jsCheck);\n  \n  // Alert if form status doesn't match calculated status\n  if (formReportedStatus !== calculatedStatus) {\n    console.warn(`⚠️  Form status mismatch! Form says \"${formReportedStatus}\" but data indicates \"${calculatedStatus}\"`);\n  }\n}\n\n// === Final Output ===\nreturn [\n  {\n    json: {\n      ...$input.first().json,\n      body: {\n        ...$input.first().json.body,\n        formData: {\n          ...formData,\n          most_recent_application_submitted_timestamp: timestampLong,\n          application_status: finalStatus,\n          // Add calculated metadata for debugging/analytics\n          _metadata: {\n            calculatedStatus,\n            formReportedStatus,\n            stepReached: metadata.formStep,\n            fieldsCompleted: fieldStatuses.filter(f => f.hasValue).length,\n            totalRequiredFields: fieldStatuses.length,\n            statusMismatch: formReportedStatus !== calculatedStatus\n          }\n        }\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -80
+      ],
+      "id": "77d6d6b2-faf9-4666-b484-22135b35774e",
+      "name": "Partial Form Functions"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "email": "={{ $json.body.formData['What-s-the-best-email-to-reach-you'] }}",
+        "additionalFields": {
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "property": "utm_campaign",
+                "value": "={{ $json.body.formData.utm_campaign }}"
+              },
+              {
+                "property": "utm_source",
+                "value": "={{ $json.body.formData.utm_source }}"
+              },
+              {
+                "property": "utm_content",
+                "value": "={{ $json.body.formData.utm_content }}"
+              },
+              {
+                "property": "utm_medium",
+                "value": "={{ $json.body.formData.utm_medium }}"
+              },
+              {
+                "property": "utm_term",
+                "value": "={{ $json.body.formData.utm_term }}"
+              },
+              {
+                "property": "application_completion_status",
+                "value": "={{ $json.body.formData.application_status }}"
+              },
+              {
+                "property": "most_recent_application_submitted_timestamp",
+                "value": "={{ $json.body.formData.most_recent_application_submitted_timestamp }}"
+              },
+              {
+                "property": "application_step_reached",
+                "value": "={{ $json.body.step }}"
+              },
+              {
+                "property": "browser_used_to_submit_application",
+                "value": "={{ $json.headers['user-agent'] }}"
+              },
+              {
+                "property": "ip_address_country",
+                "value": "={{ $json.body.formData.user_country_name }}"
+              },
+              {
+                "property": "what_was_your_business_total_revenue_last_month_",
+                "value": "={{ $json.body.formData['What-was-your-business-s-total-revenue-last-month'] }}"
+              },
+              {
+                "property": "whats_holding_your_business_back_most_",
+                "value": "={{ $json.body.formData['What-s-holding-your-business-back-most'] }}"
+              },
+              {
+                "property": "which_best_describes_your_business_model_",
+                "value": "={{ $json.body.formData['Which-best-describes-your-business-model-Other'] }}"
+              },
+              {
+                "property": "how_many_hours_are_you_currently_putting_into_the_business_weekly_",
+                "value": "={{ $json.body.formData['How-many-hours-are-you-currently-putting-into-the-business-weekly'] }}"
+              },
+              {
+                "property": "if_bottleneck_from_q2__was_no_longer_holding_your_business_back_what_could_you_achieve_in_the_nex",
+                "value": "={{ $json.body.formData['If-bottleneck-from-Q2-was-no-longer-holding-your-business-back-what-could-you-achieve-in-the-next-90-days'] }}"
+              }
+            ]
+          },
+          "firstName": "={{ $json.body.formData.firstname }}",
+          "lastName": "={{ $json.body.formData.lastname }}",
+          "phoneNumber": "={{ $json.body.formData['Phone-Number'] }}"
+        },
+        "options": {
+          "resolveData": true
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        -80
+      ],
+      "id": "d93d2114-3143-43c7-993d-896af9b3103b",
+      "name": "Update/Create HubSpot Contact",
+      "retryOnFail": true,
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "GMo7dzwLKJaHGdGS",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5845f61-7980-4d72-9ec8-79e11222b1fd",
+              "leftValue": "={{ $json.body.formData['What-s-the-best-email-to-reach-you'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -80
+      ],
+      "id": "5e9f139b-71c6-4c04-95fa-501fab4b2b00",
+      "name": "Ignore empty emails"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "founderos.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15",
+            "content-length": "4760",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "es-419,es;q=0.9",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "200.119.187.59",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "CR",
+            "cf-ray": "9626ad44b5d48dae-MIA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "https://www.founderos.com",
+            "priority": "u=3, i",
+            "referer": "https://www.founderos.com/",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "200.119.187.59, 172.70.255.91",
+            "x-forwarded-host": "founderos.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-24-5cd9cc5d7f-f4xrt",
+            "x-is-trusted": "yes",
+            "x-real-ip": "200.119.187.59"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "type": "partial",
+            "formData": {
+              "utm_source": "hs_automation",
+              "utm_medium": "email",
+              "utm_campaign": "4241516-Email Marketing",
+              "utm_term": "",
+              "utm_content": "347450845",
+              "user_country_name": "Costa Rica",
+              "What-s-the-best-email-to-reach-you": "mariaganezacr@gmail.com",
+              "What-s-your-full-name": "Maria Ganeza Valverde",
+              "firstname": "Maria",
+              "lastname": "Ganeza Valverde",
+              "Phone-Number": "+506 6056 2400",
+              "What-s-your-best-contact-number": "+5066056 2400",
+              "What-s-holding-your-business-back-most-Other": "",
+              "Which-best-describes-your-business-model-Other": "Coaching + Course creator",
+              "If-bottleneck-from-Q2-was-no-longer-holding-your-business-back-what-could-you-achieve-in-the-next-90-days": "Travel more often and delegate",
+              "checkbox-2": true,
+              "What-do-you-see-or-think-is-the-biggest-obstacle-to-removing-that-bottleneck-and-achieving-those-results": "",
+              "ip_address": "200.119.187.59",
+              "hutk": "",
+              "ipAddress": "",
+              "pageUri": "",
+              "pageId": "",
+              "pageName": "",
+              "mwr": "",
+              "status": "complete",
+              "extra_field_x9": "",
+              "js-check": "valid-js-token",
+              "cf-turnstile-response": "0.fBIbcHzmsCsfUurF_0OmpoIVR-KZOfs7TQeKlbFgtZiFWibxo2EPmuGGtNhhpOr_Ia8rr2VMPUQa11YH3sMHdBZVsrD511QwxMZoL6HRebzWMgRcsQRTTgKCXnOSd318ahOw6sC5EdVpS1CX51RlcFdOw3BjGpnqQnhnR_lbSuRecx9j9BuWtHFbY48OhbD7vkn4147DyXnfClmFRwIAZKXdw0CZl8XlT_b9Ng-YQs3lBBvW8PFRF_s94wWoFoG4vwDDOkRknWQ8pfetLcFLCIc-DbpUrSYMCGMugNjw2i74qCtr0VG3uD914fORBJGwypHwSZBb_vWuKkK1FshX_shEz6AnMqhbQeFf-PMUINWoddlxl_wd4YEMelb0TJctH8fj0R5qRIthBOejMvg8HfWCquUdWehusmciaQcnidxV0G0k5HFCtSR_UFBKOwSQxRu7HhGwhR4eCRleOK1pNJ17nC8MEKDA8ymisov7pj5VyZRbCgaSjiHIjga90POR35_XcjSfNeo2_CdJ53t3tl8wKdmkSSpBoNos0OtDomnM_LEP0r9qUPxGbL7M7A0B2XxflCGjcaVjEsqpUAdK1m4jDYanpSPfGnbJkzlgIAW6AYQUjr6yJzbxTyBRCwdJ6gqNjZOWp5ztlm2vhbcMO7gzHLD6PNv-A8rD1PNjNVll_7dMLjn6eCYVE73SPrsLeMF0u-nVGS5ISn2sQn2apk-i1GeAxVwruDKXjJZboIy5olmNUJZHUiD6gwu-m4jTnO2Le1xXq-cyuGmyyaK1muQoQv1C8E00aT1gOPmEU0nJa876YF6-R-Hd_QfZH9bQI-m79JeMZoLxYtG1FnXRpEC6RCE7NC9Sh0mvsuNez-ucVC6FSw-f2S5lRDqAWdZOQ8ZJtOVlsNAodfofH6U7YSt_WLM_bq3JpH61_fqYEqBWq0AvEJ-U6m1TimySFm08.CtLgG9qF1Y1skyGA6-SXFA.dbcedc3bfc1521743065ce037c0c4ac067ecda81fd8e940c52e78ce0437ea252",
+              "What-was-your-business-s-total-revenue-last-month": "Pre-revenue (building)",
+              "What-s-holding-your-business-back-most": "Profit margins are too low for the effort",
+              "How-many-hours-are-you-currently-putting-into-the-business-weekly": "20-40 hours",
+              "g-recaptcha-response": "03AFcWeA40d8AExrxtxNMSzIs6AZJk-1GHF-8-S6Dxb4eo0rrGeE-kM4ZxRJcowuU16HELoVP4KbQe61N3Eug8xaw15QyW1xx4Jy-wgTPH6t2JEBhb_qEFMNDs1YyKsk4OFsN4_Of0bad1MkSwLdjPfn_v2XfpVFb0obusLZsIvSJK3cUKHJ3cVQVpbIHhU7CsRnPtn1Fzgv5lQ-uRNRjTul2mVDAmdQCwrjM5gZMSKac56sAUVtZ7X4fzeY2HqmR9hYEAEI7ln0JXFNUp3zU2hvOOWLensWmfOe6ETyAog0UjIT5xIBQb9btjDG-6ccfZQelSIozpYyCGrzpL5jkBi9YIanIbMv1g3O67C1M4PrsBsVY9cTFti2LyRFPtGhOckQGcZARZ6Wt2feH2C9EyqBhukpYdk1sPcWcGE0MRe28S8xnESZAT29R-QguXbV1dnTS3nNTifUCv37Loq-P7P495siIRivmdRyMDvewyu7AcyEPttRfrANoX-KR6QbybY6a8vjaAU6gZCQ6UOal06EsBSRrNuEh_GfvzfZ2VtcNfn_gApEetz8YAXY76lwUEvInxFU2yeSqdAUcLGYOxbLcbPUVFvSOOG8xizZHe0kyLC0NYG4htAqn5VV6TW1C6PpPHsjlW30M5LHOk7u1KQUHpimacGQBFxpZ_JM_m5qyMR1EgaDGvn8cz3WxCQCVdUZ1OR9PZHK_QHwqcFVbMs21D4bWvH9uDpj4y-LW6QrD5tttW9ZyOt3K3GU1AKhXY2pt73C6LuaNyZzV7zRAykjkpCBMl5JOPR054MLKx8mkfOu7JIh9d0eQGly7HGIU9TtpBBcS06qzXX4Biez6evo_eVosbo2Glhl0dFr_TTYJqVe2UVZarlWoA9qU535Y9-oRHKKva7XFFknyXuceL6CsPAmH5btwAwy8vzRpmH_8pueOasP4wE1E1Sw37pUfNR-spbT_Tq_f13QCdh2sHG-Hc3MbnNCdBLhE6OKhCNsWqXzUJTUCl1M4MzjySPJHEdFf-vgYcrywtN8Lirr1QrU2v_kS953X3MKv2gfwmAzf4u_fSU3RIg5Yk9W7B2nLcth7WxbkkJ82m_Kbpk3QUVXmOfkeQA5ufziWXQtk1N1ZhN38F6Byf4Y--vhxGLc7wBn5a8JpaTgyKzDiz8eJvyfAfjSevfTZcBiZJaoKeBjwU8mbNDtdodfWSCT16zRsNtrcvSFozWOI-q3TDAFA4qboTzdx0ft7SsSRM4prHuma9qtu2yebwPxbhlYKKMlQ8eN7CrYOulo9RI8-_aox78nEaSUsgRnXwT-ZcGvynkMFB1vNkwAMHzDRN_9aLwgkeW1hj8UqUstvm3Z91L6HVPqLP-ECGneFcWv-93fa5ta3d3Ysh-w7tEyaIa6N3AMvVl-tvum4Uhag_kSqvptFTieWaZRCICWF6_7BYOYE1HMV-9yVe94FfPlz4qzpcTGPfuJqgdNYGXFZSLhH0-x0a9qqCfdaKh6WyywoUbU1O0bCtJiDc1mldHQdnbyhTyXNM0bn7i5rVH37Jc3uC24SJeCQYupQYtlYNVHzvbJ6KvIF4yCUU0F5UuOTbKleiELgUkkMNy7Vaj5FACX_fkuYiwlVFXrASxZUWBj71opoXiZxiksVtJWXb3VUg1CirZIjBVZaeqjYh--kOEh5rCrkVcBE_Wy-EIdVOuIxGOyFdAfyfHsefLh7zu3Nh-5wU3N1dn1VxpBRDpuOk75iQfoO6mEnABIQ7cpgLvxvOr_idh7ZIKTwG9s-oiYGviXGX-zwFR8O8UL1X6PK7fgxv5UNYgeMA48J-1u-1V0VJX97qe83Zd0ZeNtZN-AqN1x-J_z5H6y7Eh5TOkVrgtbk42wQHfOMR-rfkR0uA1hBd849zbBOr_Ndid9XOTtf6pCWH6RTIuudluK7EuYamOsptSjmNZfv-SqXxmhwYJ8GGVi20Ry2v7TOlWadtQ8IySQwH4Y5RLhZsVu26j5mRV9f2wXGkZAIBvXO4ff22HZkMZiHjPop-sMBJrFdwdiikRN076Nnk52uOcy4CRxCO8Gr7lwDjYbYPuSm4QTUtZw6TFMYGzQLS6-Xk1qyafNoKAI1zW8P8cxzlI5y_xvJTTThqwm7WFYhR0oWOU4jeOsUf81Qhu-oyNp16ehe3TV1JGsQlRaJnj-dkQHz2oDIApfd9aPgo3ar1ej2nX82kRVtTjAb-bwQtdqjmFVJn5cB5i2Nm6ab2NDGWO9OegyyZcq1sVRApo__P9hGKAKPsuBhrpya-uaKoPW2y1j0abE_nb97vf2NjiJx1SzqnCUJT62fD4YiV4CaaAAMhT6wC11rZHossnOHMfrGQrQcmyVU"
+            },
+            "step": 7,
+            "timestamp": "2025-07-21T00:45:39.688Z"
+          },
+          "webhookUrl": "https://founderos.app.n8n.cloud/webhook/webhook/partial-submission",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Ignore empty emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Partial Form Functions": {
+      "main": [
+        [
+          {
+            "node": "Update/Create HubSpot Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ignore empty emails": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Partial Form Functions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eb4e933c-6bf4-4e69-9c82-eea466579fb8",
+  "meta": {
+    "instanceId": "3ae1f016b714a4bd5ab3dd9eecf35155cef7ffe768b468ebe00755b2ce1626cb"
+  },
+  "id": "WBReuZP0WKH7izvl",
+  "tags": []
+}

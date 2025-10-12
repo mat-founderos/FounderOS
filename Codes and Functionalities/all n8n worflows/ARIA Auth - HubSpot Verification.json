@@ -1,0 +1,641 @@
+{
+  "name": "ARIA Auth - HubSpot Verification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "357ff8af-0935-4a41-a5aa-2c1ead37a685",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://www.founderos.com,https://founder-os.webflow.io,https://founder-os-white.webflow.io,https://new.founderos.com"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        112
+      ],
+      "id": "a42b0098-cc3e-44f3-9494-4937a9e55549",
+      "name": "Webhook",
+      "webhookId": "357ff8af-0935-4a41-a5aa-2c1ead37a685"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "search",
+        "returnAll": true,
+        "filterGroupsUi": {
+          "filterGroupsValues": [
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "propertyName": "email|string",
+                    "value": "={{ $('Webhook').item.json.body.email }}"
+                  }
+                ]
+              }
+            },
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "propertyName": "hs_additional_emails|enumeration",
+                    "value": "={{ $('Webhook').item.json.body.email }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "properties": [
+            "firstname",
+            "lastname",
+            "email",
+            "program_tier",
+            "aria_custom_password"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [
+        1888,
+        -32
+      ],
+      "id": "08f0ce93-1ba2-476b-8324-4cc6c45835b2",
+      "name": "Search contacts",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "GMo7dzwLKJaHGdGS",
+          "name": "HubSpot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2560,
+        112
+      ],
+      "id": "bd8af722-aee0-48e7-ba70-866bb9af4e53",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N8N Function Node: Validate Input (Fixed to pass through reCAPTCHA data)\n\nlet inputData;\nlet email, password, recaptchaToken, recaptchaAction;\n\n// Try different data structure possibilities\nconst input = $input.first().json;\n\n// Option 1: Data is in body property\nif (input.body && typeof input.body === 'object') {\n  inputData = input.body;\n  email = inputData.email;\n  password = inputData.password;\n  recaptchaToken = inputData.recaptchaToken;\n  recaptchaAction = inputData.recaptchaAction;\n}\n// Option 2: Data is directly in json\nelse if (input.email && input.password) {\n  inputData = input;\n  email = input.email;\n  password = input.password;\n  recaptchaToken = input.recaptchaToken;\n  recaptchaAction = input.recaptchaAction;\n}\n// Option 3: Data is in another property (check common ones)\nelse if (input.data && input.data.email) {\n  inputData = input.data;\n  email = inputData.email;\n  password = inputData.password;\n  recaptchaToken = inputData.recaptchaToken;\n  recaptchaAction = inputData.recaptchaAction;\n}\n// Option 4: Data is in formData property\nelse if (input.formData && input.formData.email) {\n  inputData = input.formData;\n  email = inputData.email;\n  password = inputData.password;\n  recaptchaToken = inputData.recaptchaToken;\n  recaptchaAction = inputData.recaptchaAction;\n}\n\n// Debug logging\nconsole.log('Input structure:', JSON.stringify(input, null, 2));\nconsole.log('Found email:', email || 'missing');\nconsole.log('Found password:', password ? '***' : 'missing');\nconsole.log('Found reCAPTCHA token:', recaptchaToken ? 'present' : 'missing');\nconsole.log('Found reCAPTCHA action:', recaptchaAction || 'missing');\n\n// Validate required fields\nif (!email || !password) {\n  return [\n    {\n      json: {\n        success: false,\n        message: \"Email and password are required\",\n        error: \"MISSING_FIELDS\",\n        debug: {\n          inputStructure: Object.keys(input),\n          hasBody: !!input.body,\n          hasEmail: !!email,\n          hasPassword: !!password,\n          hasRecaptchaToken: !!recaptchaToken\n        }\n      }\n    }\n  ];\n}\n\n// Clean and validate email format\nconst cleanEmail = email.trim().toLowerCase();\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\nif (!emailRegex.test(cleanEmail)) {\n  return [\n    {\n      json: {\n        success: false,\n        message: \"Please enter a valid email address\",\n        error: \"INVALID_EMAIL\"\n      }\n    }\n  ];\n}\n\n// Return cleaned data with clientIP AND reCAPTCHA data\nconst outputData = {\n  email: cleanEmail,\n  password: password.trim(),\n  clientIP: inputData.clientIP || 'unknown',\n  validated: true\n};\n\n// Add reCAPTCHA data if present\nif (recaptchaToken) {\n  outputData.recaptchaToken = recaptchaToken;\n}\nif (recaptchaAction) {\n  outputData.recaptchaAction = recaptchaAction;\n}\n\nconsole.log('Passing through data:', JSON.stringify(outputData, null, 2));\n\nreturn [\n  {\n    json: outputData\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        48
+      ],
+      "id": "3523ef31-d316-4941-ae48-c41c25779ec8",
+      "name": "Validate Input"
+    },
+    {
+      "parameters": {
+        "jsCode": "// This is the final, production-ready version with session creation and custom password support.\n\nconst currentTime = Date.now();\n\n// --- DATA FETCHING (Corrected) ---\n// 1. Get HubSpot data from the direct input (output of \"Search contacts\").\nconst hubspotData = $input.first().json;\n\n// 2. Get Form data by looking back at the \"Validate Input\" node.\n// This is a reliable way to get the data that was lost.\nlet formData = null;\ntry {\n  formData = $('Validate Input').first().json;\n} catch (e) {\n  // Could not find data from 'Validate Input' node. This will likely cause an error.\n}\n// --- END DATA FETCHING ---\n\n// Extract form data\nconst userEmail = formData?.email;\nconst userPassword = formData?.password;\nconst clientIP = formData?.clientIP || 'unknown';\n\n// Extract HubSpot data\nconst contactId = hubspotData?.id;\nconst programTier = hubspotData?.properties?.program_tier;\nconst firstName = hubspotData?.properties?.firstname || '';\nconst lastName = hubspotData?.properties?.lastname || '';\n\n// UPDATED: Pass hubspotData to validation function\nconst isInvalidAttempt = await performBasicValidation(userEmail, userPassword, contactId, programTier, hubspotData);\n\nif (isInvalidAttempt.invalid) {\n  const delay = calculateAntiAbuseDelay(userEmail, currentTime);\n  if (delay > 0) {\n    await new Promise(resolve => setTimeout(resolve, delay));\n  }\n  \n  return [{\n    json: {\n      success: false,\n      message: isInvalidAttempt.message,\n      error: isInvalidAttempt.error,\n      debug: {\n        clientIP: clientIP,\n        contactId: contactId,\n        appliedDelay: delay,\n        issue: isInvalidAttempt.reason\n      }\n    }\n  }];\n}\n\n// SUCCESS! - ONLY ONE userData DECLARATION\nconst { userData, token } = createSuccessResponse(userEmail, firstName, lastName, programTier, contactId);\n\n// Create secure session for chat page validation\nconst sessionResult = createSecureSession(userData, token, clientIP);\n\nreturn [{ \n  json: {\n    success: true,\n    message: \"Authentication successful\",\n    token: token,\n    user: userData,\n    debug: {\n      clientIP: clientIP,\n      contactId: contactId,\n      issue: 'SUCCESS',\n      sessionCreated: sessionResult.sessionCreated,\n      sessionExpires: sessionResult.expiresAt\n    }\n  } \n}];\n\n// *** HELPER FUNCTIONS ***\n\nasync function performBasicValidation(email, password, contactId, tier, hubspotData) {\n  const GENERIC_FAILURE = {\n    invalid: true,\n    message: \"Invalid credentials. Please check your details and try again.\",\n    error: \"INVALID_CREDENTIALS\",\n    reason: \"Generic failure response\"\n  };\n\n  if (!email || !password) {\n    return { invalid: true, message: \"Email and password are required\", error: \"MISSING_CREDENTIALS\", reason: 'Missing credentials' };\n  }\n  \n  if (!contactId) return GENERIC_FAILURE;\n\n  // Check if user has custom password\n  const customPassword = hubspotData?.properties?.aria_custom_password;\n  \n  if (customPassword && customPassword.trim() !== '') {\n    // User has upgraded to custom password - HubSpot ID no longer works\n    if (password.toString() === contactId.toString()) {\n      return {\n        invalid: true,\n        message: \"You've set a custom password. Please use your custom password instead of the access code.\",\n        error: \"CUSTOM_PASSWORD_SET\",\n        reason: \"User attempted HubSpot ID but has custom password\"\n      };\n    }\n    \n    // Validate custom password\n    const isValidCustomPassword = await validateCustomPassword(password, customPassword);\n    if (!isValidCustomPassword) return GENERIC_FAILURE;\n    \n  } else {\n    // User hasn't upgraded - only HubSpot ID works\n    if (password.toString() !== contactId.toString()) return GENERIC_FAILURE;\n  }\n\n  // Validate program tier\n  const allowedTiers = ['Starter', 'Founder OS', 'Velocity', 'Mastermind', 'Unlimited'];\n  const normalizedUserTier = tier ? tier.toString().trim().toLowerCase() : '';\n  if (!allowedTiers.some(t => t.toLowerCase() === normalizedUserTier)) return GENERIC_FAILURE;\n  \n  return { invalid: false };\n}\n\n// Add password validation function\nasync function validateCustomPassword(inputPassword, storedPasswordHash) {\n  const crypto = require('crypto');\n  \n  try {\n    // Extract salt and hash from stored format: \"salt:hash\"\n    const parts = storedPasswordHash.split(':');\n    if (parts.length !== 2) return false;\n    \n    const [salt, hash] = parts;\n    if (!salt || !hash) return false;\n    \n    // Hash the input password with the stored salt\n    const inputHash = crypto.pbkdf2Sync(inputPassword, salt, 10000, 64, 'sha256').toString('hex');\n    \n    // Compare hashes\n    return inputHash === hash;\n  } catch (error) {\n    return false;\n  }\n}\n\nfunction calculateAntiAbuseDelay(email, currentTime) {\n  const emailHash = simpleHash(email || '');\n  const timeWindow = Math.floor(currentTime / (5 * 60 * 1000));\n  const combinedHash = simpleHash(`${emailHash}_${timeWindow}`);\n  const baseDelay = 1000;\n  const variableDelay = (combinedHash % 4000);\n  return baseDelay + variableDelay;\n}\n\nfunction simpleHash(str) {\n  let hash = 0;\n  for (let i = 0; i < str.length; i++) {\n    const char = str.charCodeAt(i);\n    hash = ((hash << 5) - hash) + char;\n    hash |= 0; \n  }\n  return Math.abs(hash);\n}\n\nfunction createSuccessResponse(email, firstName, lastName, tier, contactId) {\n  const displayName = (firstName && lastName) ? `${firstName} ${lastName}` : (firstName || lastName || email.split('@')[0]);\n  const userData = { email, name: displayName, tier: tier ? tier.toString().trim() : '', hubspot_id: contactId.toString() };\n  const token = 'ARIA_AUTH_' + Date.now() + '_' + contactId;\n  return { userData, token };\n}\n\nfunction createSecureSession(userInfo, userToken, clientIP) {\n  try {\n    // Try n8n's workflow static data first\n    let sessions;\n    let storageMethod = 'unknown';\n    \n    try {\n      const workflowData = $execution.getWorkflowStaticData('global');\n      if (!workflowData.ariaValidSessions) {\n        workflowData.ariaValidSessions = {};\n      }\n      sessions = workflowData.ariaValidSessions;\n      storageMethod = 'workflow_static_data';\n    } catch (e1) {\n      // Fallback to global variables\n      if (!global.ariaValidSessions) {\n        global.ariaValidSessions = {};\n      }\n      sessions = global.ariaValidSessions;\n      storageMethod = 'global_variables';\n    }\n    \n    // Create session record\n    const sessionId = userInfo.hubspot_id;\n    sessions[sessionId] = {\n      userId: userInfo.hubspot_id,\n      email: userInfo.email,\n      tier: userInfo.tier,\n      createdAt: Date.now(),\n      lastActivity: Date.now(),\n      lastIP: clientIP,\n      tokenCreated: userToken,\n      storageMethod: storageMethod\n    };\n    \n    // Clean up old sessions (keep last 10)\n    const sessionIds = Object.keys(sessions);\n    if (sessionIds.length > 10) {\n      const sortedSessions = sessionIds\n        .map(id => ({ id, createdAt: sessions[id].createdAt }))\n        .sort((a, b) => b.createdAt - a.createdAt)\n        .slice(0, 10);\n      \n      const newSessions = {};\n      sortedSessions.forEach(session => {\n        newSessions[session.id] = sessions[session.id];\n      });\n      \n      // Update storage based on method used\n      if (storageMethod === 'workflow_static_data') {\n        $execution.getWorkflowStaticData('global').ariaValidSessions = newSessions;\n      } else {\n        global.ariaValidSessions = newSessions;\n      }\n    }\n    \n    return {\n      sessionCreated: true,\n      sessionId: sessionId,\n      storageMethod: storageMethod,\n      sessionCount: Object.keys(sessions).length,\n      expiresAt: new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString()\n    };\n    \n  } catch (error) {\n    return {\n      sessionCreated: false,\n      error: error.message,\n      storageMethod: 'failed'\n    };\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        -32
+      ],
+      "id": "a00691cb-4ba4-406b-a5aa-6eb3a67b5da8",
+      "name": "ARIA Authentication"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "13NV89VTxLTY3CHx9K7De0wGY-ScH4EmJ841ftSPDaXI",
+          "mode": "list",
+          "cachedResultName": "ARIA: Founder OS Tier: Active Users: Access List eff 09032025",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13NV89VTxLTY3CHx9K7De0wGY-ScH4EmJ841ftSPDaXI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1329218511,
+          "mode": "list",
+          "cachedResultName": "Access Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13NV89VTxLTY3CHx9K7De0wGY-ScH4EmJ841ftSPDaXI/edit#gid=1329218511"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Search contacts').item.json.properties.email }}",
+            "First Name": "={{ $('Search contacts').item.json.properties.firstname }}",
+            "Last Name": "={{ $('Search contacts').item.json.properties.lastname }}",
+            "HubSpot ID": "={{ $('Search contacts').item.json.properties.hs_object_id }}",
+            "Tier": "={{ $('Search contacts').item.json.properties.program_tier }}",
+            "Log": "={{ $json.message }} ",
+            "Timestamp": "={{ $now.toFormat('MMMM dd, yyyy, hh:mm a') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HubSpot ID",
+              "displayName": "HubSpot ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tier",
+              "displayName": "Tier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Log",
+              "displayName": "Log",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2784,
+        112
+      ],
+      "id": "95c0c38b-4306-4f1e-9007-c1219fe23ff1",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3JDHUz4TaVSLK9Ct",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "33e91e9c-bdba-460b-940f-ff58dcfd56b8",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "9d2edc8b-2439-44ca-8337-2a5f0d01aa22",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 0.5,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "fc75b688-149e-4a2d-8cb6-9829776ff948",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "aria_login",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        48
+      ],
+      "id": "7ae2ad7a-a1a7-40df-ba6a-4667b15da869",
+      "name": "Check Google Recaptcha"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.google.com/recaptcha/api/siteverify",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "secret",
+              "value": "6LcGI2grAAAAAG1AFOwXh_Lt6MRVAKJTgPFB8GNV"
+            },
+            {
+              "name": "response",
+              "value": "={{ $json.recaptchaToken }}"
+            },
+            {
+              "name": "remoteip",
+              "value": "={{ $json.clientIP }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        48
+      ],
+      "id": "d794a991-0331-48e5-828e-1657cccfe4ca",
+      "name": "Google ReCaptcha Post Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// This is the permanent Scorekeeper. It updates the user's score after a login attempt.\n\n// --- CONFIGURATION ---\nconst RATE_LIMIT_CONFIG = {\n  ATTEMPT_WINDOW_MS: 15 * 60 * 1000,\n  MAX_ATTEMPTS: 5,\n  LOCKOUT_PERIODS_MS: [\n    5 * 60 * 1000,    // 1st lockout: 5 minutes\n    30 * 60 * 1000,   // 2nd lockout: 30 minutes\n    24 * 60 * 60 * 1000 // 3rd+ lockout: 24 hours\n  ]\n};\n// --- END CONFIGURATION ---\n\nconst authResult = $input.first().json;\n// **THE FIX:** The IP address is inside the 'debug' object from the previous node.\nconst clientIP = authResult.debug?.clientIP || 'unknown';\n\nif (clientIP === 'unknown') {\n    console.log(\"Warning: Client IP not found in authResult.debug. Skipping rate limit logic.\");\n    return [{ json: authResult }];\n}\n\nconst store = $getWorkflowStaticData('global');\nif (!store.rateLimiter) {\n  store.rateLimiter = {};\n}\nconst records = store.rateLimiter;\nconst currentTime = Date.now();\n\nif (authResult.success === true) {\n  if (records[clientIP]) {\n    console.log(`Success for IP: ${clientIP}. Clearing records.`);\n    delete records[clientIP];\n  }\n} \nelse {\n  console.log(`Failure for IP: ${clientIP}. Recording attempt.`);\n  let record = records[clientIP] || { attempts: 0, lockoutLevel: 0, firstAttempt: currentTime };\n\n  if (currentTime > record.firstAttempt + RATE_LIMIT_CONFIG.ATTEMPT_WINDOW_MS) {\n      record = { attempts: 0, lockoutLevel: record.lockoutLevel, firstAttempt: currentTime };\n  }\n\n  record.attempts += 1;\n  console.log(`IP ${clientIP} now has ${record.attempts} failed attempts.`);\n\n  if (record.attempts >= RATE_LIMIT_CONFIG.MAX_ATTEMPTS) {\n    const lockoutIndex = Math.min(record.lockoutLevel, RATE_LIMIT_CONFIG.LOCKOUT_PERIODS_MS.length - 1);\n    const lockoutDuration = RATE_LIMIT_CONFIG.LOCKOUT_PERIODS_MS[lockoutIndex];\n    \n    record.lockedUntil = currentTime + lockoutDuration;\n    record.lockoutLevel += 1;\n    record.attempts = 0; // Reset attempts after lockout\n    delete record.firstAttempt;\n    console.log(`LOCKOUT APPLIED for IP ${clientIP}. Duration: ${lockoutDuration / 60000} minutes.`);\n  }\n  \n  records[clientIP] = record;\n}\n\n// Pass the original login result to the final response node.\nreturn [{ json: authResult }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        -32
+      ],
+      "id": "ec39ac7f-e7e8-4a53-bda5-dd18a6c66a5f",
+      "name": "Rate Limit Manager"
+    },
+    {
+      "parameters": {
+        "jsCode": "// This node acts as a gatekeeper, rejecting any request that doesn't have the shared secret.\n\n// --- CONFIGURATION ---\n// IMPORTANT: This secret must be the same one you add to your Webflow code.\n// For best security, store this as a credential in n8n.\nconst SHARED_SECRET = \"soJviX7ATFSThIY8Fq1vQbwjl8o265ww\";\nconst SECRET_HEADER_NAME = \"x-aria-secret\"; // The name of the header\n// --- END CONFIGURATION ---\n\nconst headers = $input.first().json.headers || {};\nconst receivedSecret = headers[SECRET_HEADER_NAME];\n\n// 1. Check if the secret is present and correct.\nif (receivedSecret !== SHARED_SECRET) {\n  console.log(\"Unauthorized attempt blocked. Missing or incorrect secret header.\");\n  // Immediately stop the workflow and return a generic error.\n  return [{\n    json: {\n      success: false,\n      message: \"Unauthorized access.\",\n      error: \"UNAUTHORIZED\"\n    }\n  }];\n}\n\n// 2. If the secret is correct, pass the data through to the next node.\nconsole.log(\"Secret header check passed. Proceeding.\");\nreturn $input.all();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        112
+      ],
+      "id": "fdb180af-180f-4fce-8614-8f2d7712a521",
+      "name": "Header Secret Check"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7455d031-a5c7-4977-aed5-5747612145ed",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "UNAUTHORIZED",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        544,
+        112
+      ],
+      "id": "35485f1d-aac5-4608-93c5-56c8ac1d2709",
+      "name": "Header Secret Check Condition"
+    },
+    {
+      "parameters": {
+        "jsCode": "// This is the permanent security bouncer for your workflow.\n\n// --- CONFIGURATION ---\nconst RATE_LIMIT_CONFIG = {\n  LOCKOUT_MESSAGE: \"Too many failed attempts. Please wait before trying again.\"\n};\n// --- END CONFIGURATION ---\n\nconst store = $getWorkflowStaticData('global');\nif (!store.rateLimiter) {\n  store.rateLimiter = {}; \n}\nconst records = store.rateLimiter;\n\nconst headers = $input.first().json.headers || {};\nconst rawIP = headers['x-forwarded-for'] || headers['cf-connecting-ip'] || headers['x-real-ip'] || 'unknown';\nconst clientIP = rawIP.toString().split(',')[0].trim();\nconst currentTime = Date.now();\nconst record = records[clientIP];\n\n// Check if the user is currently locked out.\nif (record && record.lockedUntil && currentTime < record.lockedUntil) {\n  const remainingMs = record.lockedUntil - currentTime;\n  const remainingMinutes = Math.ceil(remainingMs / 60000);\n\n  // Stop the workflow immediately and return an error.\n  return [{\n    json: {\n      success: false,\n      // **THE FIX:** Send only the base message. The frontend will add the time remaining.\n      message: RATE_LIMIT_CONFIG.LOCKOUT_MESSAGE,\n      error: \"RATE_LIMITED\",\n      lockoutInfo: {\n        level: record.lockoutLevel,\n        lockedUntil: new Date(record.lockedUntil).toISOString(),\n        remainingMinutes: remainingMinutes\n      }\n    }\n  }];\n}\n\n// If not locked out, add the client's IP to the data and pass it to the next node.\nconst inputData = $input.first().json;\nconst outputData = inputData.body || {}; \noutputData.clientIP = clientIP; \n\nreturn [{\n  json: outputData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        112
+      ],
+      "id": "e81664f9-f540-4181-9f5f-a9bf88d819c8",
+      "name": "Rate Limiting Check"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9be842db-a35b-439b-a53b-7a25d9f88217",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "RATE_LIMITED",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        112
+      ],
+      "id": "9e74cd40-9910-497a-a9b2-be8f05b32ed8",
+      "name": "Rate Limiting Check Condition"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "founderos.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+            "content-length": "1789",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-US,en;q=0.9",
+            "cache-control": "no-cache",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "49.145.4.8",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PH",
+            "cf-ray": "98c488dc75052ac4-LAX",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "https://founder-os-white.webflow.io",
+            "pragma": "no-cache",
+            "priority": "u=1, i",
+            "referer": "https://founder-os-white.webflow.io/",
+            "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-aria-secret": "soJviX7ATFSThIY8Fq1vQbwjl8o265ww",
+            "x-forwarded-for": "49.145.4.8, 162.158.186.166",
+            "x-forwarded-host": "founderos.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-24-5cd9cc5d7f-xxgbz",
+            "x-is-trusted": "yes",
+            "x-real-ip": "49.145.4.8"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "email": "calabiamatthew@live.com",
+            "password": "Shine101712",
+            "recaptchaToken": "0cAFcWeA557CyMt-XD4DN2Dop0XrAmbp4U5vZXY7a_4hEIuy6A27NIV1oCTGFKTw2_8BsPDhFC2yvhNwLVSgcZwcnPupg7KOMUvSom1MKrH2Z6Gvs9yohgIHV60Q-7hLuyR3u5E4N8Etc0DY92RV2SWvCeTR2Wy3vfUw1IP4lLCJnCMJj7HqslpxPd2pKcF9ZvXk8j_WzZY3AzCjdssW-sddIbtL12sLx48lSWymdNI7IAnm8beU5tL36qU2gHhmISx9KqGSLpyzD7vMPfSSPKm0nukSzICkDbzUcLkAHndSTjPfNd-dRrqiakbxwoMgwCpUXAH4Mr_RZmrUt9pxJiBnk4NZyeM4uxqmskL7Pw247fPMx3BCJR7frktKTn9XtWf8fbCrIg44AfUDJAzZbmx6evfhJGhlzv3cbWdYeXotZJeeDd_TZLX21p4Dq3JfeBlV_zMovuZsDlUwubAmeG81KWfcDMUul5c1cJmDnKGSmduObvy5didPGaTd_mjsD4QDUcwyq1pjwYCSI_N4GqHauSu50XwhLFwmp-8JYWw79cv2rYnoNXmN0vFjohOJG9R7di5Cs8DRaRsiH_F37PEWef0mC2f1hR-d6rYjUc5YDKMQFw9cBQBR6mi_D9TkQDEqKnEG7ZSyGrxiHxvKnt0_vBsrCgn-gJLeAs5r7lwl4_gfkhYdIgW4Y4W6xfog3aaESVCfcpuorZUJ_pzCAYyOsy8HuIQOzI8vc0aI1INwLIdzvtRktWl2NBvc-2WXt4d638cwi9V47WNueq31fe9L7NA6IUqbESj8JBuQLozeVvw0iGSU42ZN1ExhmZjPWw2QMYmQrE1VpJYd-ViCvveM8wzMbCpzKwRr1s6TN-ZfH9GQ6Jdp_IvBoPRk77D2DcDMzyppDDJpwg6FuBPum0Nvq9_PUmKIOPKj3FJ7YZ7uXH-s79iFNcPEQB6bLLKvNsG1dMODgBl1AIzRh_SGEPnzZVqf9JqFz0rNQXja9SWNMC6jldB4KwY1LKMHYC39B1khmjjh6wmcHLJ6DsjJPtrnpmnEFv1qwXCdk0dbzjoFLRIhpykcipIcQeAi8pY8-xxLQ0xbxFr3tCd5NFo8ljllhQ04hpYipTm6bKa85TlnVbfzR-OBPXilU7_ZmI_hgBqs1FaFqXnAxQrKD7sz6tIlAF39vUq1icLf6sRO-HAS2NlMwfME8FYgeGMRiiku0VPRMOtNq4Zyat-WslUSI8NU0nnXhEAnZFNO6DMrHX2fhLDx1_YbFYQJImhVxrfifQA8AVfcoh_RfBIY4GV3T_xJgzj_4G8A1kSerCHbrQ_Jq-ymi1Tes4akDF6LWB7wqvf6iMiqUpXrb_T9BV5PAO66jk2MjMQJTtzF28CLM72dfOoTopECiSo4RVf7zr6EDwnNxhCnU7ehcM1jOrvbN0sFEyIch2B-ksXP3thPLQRO-0fkyCf3srxooNSclDC6y1wTnSYouQ0KlqGEXoKP6bwPzaGbMgRkHZ-vDqzWqbjLmkJd2MucxWtzEY4KOxyV3fRMzWMu8N3d5EC6fB4jPh1rBceWEd6rs3TUpwzPFZgwyVwwD_uIQL92iNhoXbghLIgZcwuiEe_Pb0txJ3GCb4hZujKGQp6v42b6xzoLu-T1PjIOqmQ_49GKtAQh7QPP14xYPijPv9ynWv",
+            "recaptchaAction": "aria_login"
+          },
+          "webhookUrl": "https://founderos.app.n8n.cloud/webhook/357ff8af-0935-4a41-a5aa-2c1ead37a685",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Header Secret Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search contacts": {
+      "main": [
+        [
+          {
+            "node": "ARIA Authentication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Google ReCaptcha Post Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ARIA Authentication": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Google Recaptcha": {
+      "main": [
+        [
+          {
+            "node": "Search contacts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google ReCaptcha Post Request": {
+      "main": [
+        [
+          {
+            "node": "Check Google Recaptcha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limit Manager": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Header Secret Check": {
+      "main": [
+        [
+          {
+            "node": "Header Secret Check Condition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Header Secret Check Condition": {
+      "main": [
+        [
+          {
+            "node": "Rate Limiting Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limiting Check": {
+      "main": [
+        [
+          {
+            "node": "Rate Limiting Check Condition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limiting Check Condition": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dc427342-29e8-48ca-9cce-2c56862a665e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3ae1f016b714a4bd5ab3dd9eecf35155cef7ffe768b468ebe00755b2ce1626cb"
+  },
+  "id": "dFN2n0hylT9tKw60",
+  "tags": []
+}

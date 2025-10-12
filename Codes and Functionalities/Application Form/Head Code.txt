@@ -1,0 +1,21 @@
+
+<!--<script src="http://127.0.0.1:5501/setupReCAPTCHAForm.js"></script> -->
+
+<style>
+.multistep-choice-checkbox:has(input[type="checkbox"]:checked), .multistep-choice:has(input:checked), .multistep-choice-last:has(input:checked) {
+    background-color: var(--primary)!important;
+}
+#application {
+  scroll-margin-top: 200px;
+}
+</style>
+
+
+<!-- [Attributes by Finsweet] Query Param -->
+<script defer src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-queryparam@1/queryparam.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fathomClickById('application', 'Application CTA Click');
+  });
+</script>
