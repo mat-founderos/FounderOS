@@ -241,6 +241,7 @@ function initMultistepForm(containerSelector) {
 
   // Form Submit
   container.find(".multistep-form-modal").submit(function (e) {
+      collectFormData();
     // Referral tracking (final submit only)
     if (window.RH && typeof RH.pendingReferral === "function") {
       RH.pendingReferral(currentFormData);
