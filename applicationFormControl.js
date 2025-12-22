@@ -242,10 +242,17 @@ function initMultistepForm(containerSelector) {
   // Form Submit
   container.find(".multistep-form-modal").submit(function (e) {
       collectFormData();
-    // Referral tracking (final submit only)
-    if (window.RH && typeof RH.pendingReferral === "function") {
-      RH.pendingReferral(currentFormData);
-    }
+     if (currentStep !== totalSteps - 1) return;
+
+  // Prevent double firing
+  if (referralSent) return;
+  referralSent = true;
+
+  collectFormData();
+
+  if (window.RH && typeof RH.pendingReferral === "function") {
+    RH.pendingReferral(currentFormData);
+  }
     fathom.trackEvent("Application Form Submit");
   });
 
