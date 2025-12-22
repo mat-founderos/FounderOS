@@ -241,7 +241,6 @@ function initMultistepForm(containerSelector) {
 
   // Form Submit
   container.find(".multistep-form-modal").submit(function (e) {
-      collectFormData();
    if (currentStep !== totalSteps - 1) return;
   if (referralSent) return;
 
