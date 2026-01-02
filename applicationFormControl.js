@@ -330,21 +330,28 @@ function initMultistepForm(containerSelector) {
   });
 
   // Modal open/close (global, not scoped because you open full screen modals)
-  document.addEventListener("click", function (e) {
-    if (e.target.closest(".application-open")) {
-      document
-        .querySelectorAll(".appplication-form-modal")
-        .forEach((el) => (el.style.display = "flex"));
-      document.body.style.overflow = "hidden";
-      window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
-    }
-    if (e.target.closest(".application-close")) {
-      document
-        .querySelectorAll(".appplication-form-modal")
-        .forEach((el) => (el.style.display = "none"));
-      document.body.style.overflow = "";
-    }
-  });
+ document.addEventListener("click", function (e) {
+  const openBtn = e.target.closest(".application-open");
+  const closeBtn = e.target.closest(".application-close");
+
+  if (openBtn) {
+    e.preventDefault(); // 👈 ADD THIS
+    document
+      .querySelectorAll(".appplication-form-modal")
+      .forEach((el) => (el.style.display = "flex"));
+    document.body.style.overflow = "hidden";
+    window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
+  }
+
+  if (closeBtn) {
+    e.preventDefault(); // 👈 optional but safe
+    document
+      .querySelectorAll(".appplication-form-modal")
+      .forEach((el) => (el.style.display = "none"));
+    document.body.style.overflow = "";
+  }
+});
+
 
   // Unload partial save
   window.addEventListener("beforeunload", async function () {
