@@ -1,201 +1,433 @@
-let currentStep = 0;
-let currentFormData = {};
-$(document).ready(function () { 
-    
-    function r() {
-        const progressPercent = (currentStep / (o - 1)) * 100; 
-        e.css("width", progressPercent + "%");
-        $(".multistep-progress-number").text((currentStep + 1) + "/" + o);
-        $(".multistep-progress-percent").text(Math.round(progressPercent) + "%");
-      }
-      
-      
-  function i() {
-    t.hide().eq(currentStep).show();
-    $(".multistep-form-previous-modal").toggle(currentStep > 0);
-    $(".multistep-form-next-modal").toggle(currentStep < o - 1);
+function initMultistepForm(containerSelector) {
+  let currentStep = 0,
+    currentFormData = {};
+
+  const container = $(containerSelector);
+  const steps = container.find(".multistep-form-step-modal");
+  const progressBar = container.find(
+    ".multistep-form-progressbar-progress-modal"
+  );
+  const totalSteps = steps.length;
+  const endpoint =
+    "https://founderos.app.n8n.cloud/webhook/webhook/partial-submission";
+
+  function updateProgress() {
+    const percent = (currentStep / (totalSteps - 1)) * 100;
+    progressBar.css("width", percent + "%");
+    container
+      .find(".multistep-progress-number")
+      .text(currentStep + 1 + "/" + totalSteps);
+    container
+      .find(".multistep-progress-percent")
+      .text(Math.round(percent) + "%");
   }
-  function c() {
-    $(".multistep-form-modal input, .multistep-form-modal select, .multistep-form-modal textarea").each(function () {
-      const t = $(this).attr("name") || $(this).attr("id");
-      if (t) {
+
+  function updateStep() {
+    steps.hide().eq(currentStep).show();
+    container.find(".multistep-form-previous-modal").toggle(currentStep > 0);
+    container
+      .find(".multistep-form-next-modal")
+      .toggle(currentStep < totalSteps - 1);
+  }
+
+  function collectFormData() {
+    container.find("input, select, textarea").each(function () {
+      const name = $(this).attr("name") || $(this).attr("id");
+      if (name) {
         if ($(this).is(":checkbox")) {
-          currentFormData[t] = $(this).prop("checked");
+          currentFormData[name] = $(this).prop("checked");
         } else if ($(this).is(":radio")) {
-          if ($(this).prop("checked")) {
-            currentFormData[t] = $(this).val();
-          }
+          if ($(this).prop("checked")) currentFormData[name] = $(this).val();
         } else {
-          currentFormData[t] = $(this).val().trim();
+          currentFormData[name] = $(this).val().trim();
         }
       }
     });
   }
 
-  const webhookURL = "https://founderos.app.n8n.cloud/webhook/webhook/partial-lead";
+  function isLikelySpam(formData) {
+    for (const [key, value] of Object.entries(formData)) {
+      const excludedFields = [
+        "90-day-timeframe",
+        "cf-turnstile-response",
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_term",
+        "utm_content",
+        "user_country_name",
+      ];
 
-  async function a() {
-    c();
+      if (excludedFields.includes(key)) continue;
+
+      const inputEl = container.find(`[name="${key}"], #${key}`);
+      const isHiddenField =
+        inputEl.length &&
+        (inputEl.attr("type") === "hidden" ||
+          !inputEl.is(":visible") ||
+          inputEl.css("opacity") === "0" ||
+          inputEl.css("display") === "none" ||
+          inputEl.css("visibility") === "hidden" ||
+          inputEl.hasClass("hide"));
+
+      if (isHiddenField) continue;
+      if (typeof value !== "string") continue;
+
+      const text = value.trim();
+      const lowercase = text.toLowerCase();
+
+      if (text.length > 150) {
+        return "Please keep your response under 150 characters.";
+      }
+      if (/^[0-9]+@(?:gmail|yahoo|outlook)\./i.test(lowercase)) {
+        return "Please use a valid email address, not one made of only numbers.";
+      }
+
+      if (/([a-z]{3,})\1{2,}/i.test(text.replace(/[^a-z]/gi, ""))) {
+        return "Your response appears to repeat too often.";
+      }
+
+      if (/@(tempmail|mailinator|sharklasers|guerrillamail)/i.test(lowercase)) {
+        return "Please use a personal or business email, not a temporary one.";
+      }
+
+      if (/^(asdf|sdfg|dfgh|fghj|hjkl|qwer|zxcv){1,2}$/i.test(lowercase)) {
+        return "Please avoid using random key patterns.";
+      }
+    }
+
+    return null;
+  }
+
+  async function sendPartial() {
+    collectFormData();
+
+    if (isLikelySpam(currentFormData)) {
+      console.warn("Spam detected. Skipping partial submission.");
+      return;
+    }
+
     try {
-      if (!(await fetch(webhookURL, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({type: "partial", formData: currentFormData, step: currentStep, timestamp: (new Date).toISOString()})})).ok) {
-        throw new Error("Failed to send partial data");
-      }
-    } catch (t) {
-      console.error("Partial data send failed:", t);
+      await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "partial",
+          formData: currentFormData,
+          step: currentStep,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (err) {
+      console.error("Partial data send failed:", err);
     }
   }
-  async function l(e) {
-    // Prevent moving to an invalid step
-    if (currentStep + e >= 0 && currentStep + e < o) {
-      let o = t.eq(currentStep);
-      if (e !== 1 || function (t) {
-        let r = t.find("#Email");
-        let i = t.find("#Phone-Number");
-        let c = t.find(".multistep-form-error");
-        let a = true;
-        var l;
-        if (r.length) {
-          l = r.val().trim();
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(l)) {
-            c.text("Please enter a valid email address.").show();
-            a = false;
-          }
-        }
-        if (i.length && /[a-zA-Z]/.test(i.val().trim())) {
-          c.text("Phone number should not contain letters.").show();
-          a = false;
-        }
-       
-        if (a) {
-          c.hide();
-        }
-        return a;
-      }(o)) {
-          currentStep += e;
-        
-          if (window.fathom) {
-            window.trackedSteps = window.trackedSteps || new Set();
-            if (!window.trackedSteps.has(currentStep)) {
-              const eventLabel = `Application Form Submit (Step: ${currentStep + 1})`;
-              fathom.trackEvent(eventLabel);
-              window.trackedSteps.add(currentStep);
-            }
-          }
-        
-          i();
-          r();
-          await a();
-        }
-    }
-  }
-  const t = $(".multistep-form-step-modal ");
-  const e = $(".multistep-form-progressbar-progress-modal");
-  const o = t.length;
-  $(".msf-button, .multistep-form-next-modal ").click(() => l(1));
-  $(".multistep-form-previous-modal ").click(() => l(-1));
-  $(".multistep-choice").change(function () {
-    if ($("#first-question-no").is(":checked")) {
-      window.location.href = "/training";
-    } else {
-      l(1);
-    }
-  });
-  $("#first-question-no").on("click", function () {
-    window.location.href = "/training";
-  });
-  i();
-  r();
-  $(".multistep-form-modal").submit(function (t) {
-    fathom.trackEvent("Application Form Submit - Variant A"); // Track form submission
-    t.preventDefault();
-    c(); // Your existing tracking or cleanup logic
-  
-    let fullName = (currentFormData["Full-Name"] || "").trim();
-    let [firstName, ...rest] = fullName.split(" ");
-    let lastName = rest.join(" ");
-    let e = encodeURIComponent(firstName);
-    let l = encodeURIComponent(lastName);
-    let o = encodeURIComponent(currentFormData.Email || "");
-    let n = encodeURIComponent(currentFormData.phone || "");
-  
-    // Weighted routing logic: 0–64 goes to /intro-call (Setter), 65–99 goes to /call (Closer)
-    const roll = Math.floor(Math.random() * 100);
-    const r = roll < 75; // true = setter
-  
-    const i = r ? "/intro-call" : "/call";
-  
-    // Fathom tracking for redirection event
-    fathom.trackEvent(r ? "Redirect to Setter (Intro Call)" : "Redirect to Closer (Call)");
-  
-    // Optional: store outcome in localStorage
-    localStorage.setItem("bookingOutcome", r ? "setter" : "closer");
-  
-    // Redirect with query params
-    window.location.href = `${i}?firstname=${e}&lastname=${l}&phone=${n}&email=${o}`;
-  });
-  
-  
-  
-  document.querySelectorAll(".multistep-choice-checkbox input").forEach(t => {
-    t.addEventListener("change", () => {
-      const e = t.closest(".multistep-choice-checkbox");
-      if (t.checked) {
-        e.style.backgroundColor = "#ffffff4d";
-      } else {
-        e.style.backgroundColor = "";
+
+  function validateStep(stepElement) {
+    let isValid = true;
+    const emailInput = stepElement.find("#Email");
+    const phoneInput = stepElement.find("#Phone-Number");
+    const errorBox = stepElement.find(".multistep-form-error");
+
+    errorBox.text("").hide();
+
+    if (emailInput.length) {
+      const emailVal = emailInput.val().trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        errorBox.text("Please enter a valid email address.").show();
+        return false;
       }
-    });
-  });
-  
-  document.querySelectorAll(".multistep-choice-last input").forEach(t => {
-    t.addEventListener("change", () => {
-      (function (t, e) {
-        document.querySelectorAll(e).forEach(t => {
-          t.style.backgroundColor = "";
+    }
+
+    if (phoneInput.length) {
+      const phoneVal = phoneInput.val().trim();
+      if (/[a-zA-Z]/.test(phoneVal)) {
+        errorBox.text("Phone number should not contain letters.").show();
+        return false;
+      }
+    }
+
+    collectFormData();
+    const spamResult = isLikelySpam(currentFormData);
+    if (spamResult) {
+      errorBox.text(spamResult).show();
+      return false;
+    }
+
+    // Mandatory step logic: Steps 1,2,4,5,6,7 (Indexes 0,1,3,4,5,6)
+    const mandatorySteps = [0, 1, 3, 4, 5, 6];
+    if (mandatorySteps.includes(currentStep)) {
+      let hasValidInput = false;
+
+      // Check for filled inputs (text, textarea, select, checkbox)
+      stepElement
+        .find("input:not([type=radio]), select, textarea")
+        .each(function () {
+          const el = $(this);
+          if (!el.is(":visible") || el.prop("disabled")) return;
+
+          if (el.is(":checkbox") && el.prop("checked")) {
+            hasValidInput = true;
+          } else if (!el.is(":checkbox") && el.val().trim() !== "") {
+            hasValidInput = true;
+          }
         });
-        const o = t.closest(e);
-        if (t.checked) {
-          o.style.backgroundColor = "#ffffff4d";
-        }
-      }(t, ".multistep-choice-last"));
-      a();
-    });
-  });
-  $(document).on("keydown", function (t) {
-    if (t.key === "Enter") {
-      t.preventDefault();
-      $(".multistep-form-next-modal ").click();
-    }
-    if (t.key === "Escape") {
-      document.querySelector(".appplication-form-modal").style.display = "none";
-      document.body.style.overflow = "";
-    }
-  });
-  document.addEventListener("click", function (t) {
-    if (t.target.closest(".application-open")) {
-        document.querySelectorAll(".appplication-form-modal").forEach(t => t.style.display = "flex");
-        document.body.style.overflow = "hidden";
-        if (window.fathom) {
-          window.trackedSteps = window.trackedSteps || new Set();
-          if (!window.trackedSteps.has(0)) {
-            fathom.trackEvent("Application Form Submit (Step: 1)");
-            window.trackedSteps.add(0);
-          }
+
+      // Check for valid radio groups
+      const radioNames = new Set();
+      stepElement.find("input[type=radio]").each(function () {
+        const name = $(this).attr("name");
+        if (name) radioNames.add(name);
+      });
+
+      for (let name of radioNames) {
+        const group = stepElement.find(`input[name="${name}"]`);
+        if (group.is(":checked")) {
+          hasValidInput = true;
+          break;
         }
       }
-      
-    if (t.target.closest(".application-close")) {
-      document.querySelectorAll(".appplication-form-modal").forEach(t => t.style.display = "none");
-      document.body.style.overflow = "";
+
+      if (!hasValidInput) {
+        errorBox.text("This step is required. Please answer before continuing.").show();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async function goToStep(direction) {
+    if (currentStep + direction >= 0 && currentStep + direction < totalSteps) {
+      const currentStepElement = steps.eq(currentStep);
+
+      if (direction === 1 && !validateStep(currentStepElement)) return;
+
+      currentStep += direction;
+
+      if (window.fathom) {
+        window.trackedSteps = window.trackedSteps || new Set();
+        if (!window.trackedSteps.has(currentStep)) {
+          fathom.trackEvent(
+            `Application Form Submit (Step: ${currentStep + 1})`
+          );
+          window.trackedSteps.add(currentStep);
+        }
+      }
+
+      updateStep();
+      updateProgress();
+      await sendPartial();
+    }
+  }
+
+  // Button Handlers
+  container
+    .find(".msf-button, .multistep-form-next-modal")
+    .click(() => goToStep(1));
+  container.find(".multistep-form-previous-modal").click(() => goToStep(-1));
+
+  // Choice Handler
+  container.find(".multistep-choice").change(function () {
+    if (container.find("#first-question-no").is(":checked")) {
+      window.location.href = "/revenue-accelerator";
+    } else {
+      goToStep(1);
     }
   });
-  window.addEventListener("beforeunload", async function (t) {
-    c();
+
+  container.find("#first-question-no").on("click", function () {
+    window.location.href = "/revenue-accelerator";
+  });
+
+  // Form Submit
+  container.find(".multistep-form-modal").submit(function (e) {
+
+  collectFormData();
+
+  if (window.RH && typeof RH.pendingReferral === "function") {
+    RH.pendingReferral(currentFormData);
+  }
+    fathom.trackEvent("Application Form Submit");
+  });
+
+  // Checkbox background logic
+  container.find(".multistep-choice-checkbox input").change(function () {
+    const parent = $(this).closest(".multistep-choice-checkbox");
+    if ($(this).prop("checked")) {
+      parent.css("background-color", "#ffffff4d");
+    } else {
+      parent.css("background-color", "");
+    }
+  });
+
+  container.find(".multistep-choice-last input").change(function () {
+    container.find(".multistep-choice-last").css("background-color", "");
+    const parent = $(this).closest(".multistep-choice-last");
+    if ($(this).prop("checked")) {
+      parent.css("background-color", "#ffffff4d");
+    }
+    sendPartial();
+  });
+
+  // First Name + Last Name auto split
+  container.find("#What-s-your-full-name").on("input", function () {
+    const fullName = $(this).val().trim().split(" ");
+    container.find("#firstname").val(fullName[0] || "");
+    container.find("#lastname").val(fullName.slice(1).join(" ") || "");
+  });
+
+  // Dynamic question text logic
+  window.addEventListener("load", function () {
+    const radios = container.find('input[type="radio"]');
+    const dynamicText = container.find(".q2-dynamic");
+    const otherField = container.find(
+      'input[name="What-s-the-1-bottleneck-in-your-business-right-now-Other"]'
+    );
+
+    dynamicText.text(
+      "8. If your main challenge was solved, what could you achieve in the next 90 days?"
+    );
+
+    const textMap = {
+      "The-business-needs-you-in-day-to-day-operations":
+        "8. If day-to-day operations no longer needed you, what could you achieve in the next 90 days working “on” the business, instead of being in it?",
+      "Revenue-has-plateaued-at-current-levels":
+        "8. If your revenue was no longer plateaued, what revenue level do you think you could achieve in the next 90 days?",
+      "The-team-needs-you-for-every-decision":
+        "8. If your team could make decisions without you, what could you accomplish in the next 90 days?",
+      "Lead-flow-is-unpredictable":
+        "8. If you had consistent, predictable lead flow, what would that do for you and your business?",
+      "Profit-margins-are-too-low-for-the-effort":
+        "8. If your business had healthy 40%+ profit margins, what would that allow you to do that you can’t do now?",
+    };
+
+    radios.each(function () {
+      $(this).change(function () {
+        const id = this.id;
+        if (this.checked && textMap[id]) {
+          dynamicText.text(textMap[id]);
+        }
+      });
+    });
+
+    if (otherField.length) {
+      otherField.on("input", function () {
+        if (this.value.trim() !== "") {
+          dynamicText.text(
+            "8. If your main challenge was solved, what could you achieve in the next 90 days?"
+          );
+        }
+      });
+    }
+  });
+
+  // Enter + Escape key handlers
+  $(document).on("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      container.find(".multistep-form-next-modal").click();
+    }
+  });
+
+  // Modal open/close (global, not scoped because you open full screen modals)
+ document.addEventListener("click", function (e) {
+  const openBtn = e.target.closest(".application-open");
+  const closeBtn = e.target.closest(".application-close");
+
+  if (openBtn) {
+    e.preventDefault(); // 👈 ADD THIS
+    document
+      .querySelectorAll(".appplication-form-modal")
+      .forEach((el) => (el.style.display = "flex"));
+    document.body.style.overflow = "hidden";
+    window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
+  }
+
+  if (closeBtn) {
+    e.preventDefault(); // 👈 optional but safe
+    document
+      .querySelectorAll(".appplication-form-modal")
+      .forEach((el) => (el.style.display = "none"));
+    document.body.style.overflow = "";
+  }
+});
+
+
+  // Unload partial save
+  window.addEventListener("beforeunload", async function () {
+    collectFormData();
     try {
-      await fetch(webhookURL, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({type: "partial", formData: currentFormData, step: currentStep, timestamp: (new Date).toISOString()}), keepalive: true});
-    } catch (t) {
-      console.error("Failed to send data before unload:", t);
+      await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "partial",
+          formData: currentFormData,
+          step: currentStep,
+          timestamp: new Date().toISOString(),
+        }),
+        keepalive: true,
+      });
+    } catch (err) {
+      console.error("Failed to send data before unload:", err);
     }
   });
-  console.error = function () {};
+
+  $(".status").val("complete");
+
+  // Initialize first step
+  updateStep();
+  updateProgress();
+
+  // Reusable function to sync textfield and radio group both ways
+  function setupOtherFieldSync(textFieldName, radioGroupName) {
+    const textField = container.find(`input[name="${textFieldName}"]`);
+    const radioGroup = container.find(`input[name="${radioGroupName}"]`);
+
+    // When typing into the text field, uncheck radio group
+    textField.on("input", function () {
+      const value = $(this).val().trim();
+      if (value !== "") {
+        radioGroup.prop("checked", false);
+      }
+    });
+
+    // When selecting any radio button, clear the text field
+    radioGroup.on("change", function () {
+      textField.val("");
+    });
+  }
+
+  setupOtherFieldSync(
+    "What-s-the-1-bottleneck-in-your-business-right-now-Other",
+    "What-s-the-1-bottleneck-in-your-business-right-now"
+  );
+  setupOtherFieldSync(
+    "What-type-of-business-do-you-run-Other",
+    "What-type-of-business-do-you-run"
+  );
+}
+
+$(document).ready(function () {
+  // Get values from input fields and combine
+  const firstName = $("[name='firstname']").val();
+  const lastName = $("[name='lastname']").val();
+
+  if (firstName && lastName) {
+    $(".full-name").val(`${firstName} ${lastName}`).trigger("input");
+  } else if (firstName) {
+    $(".full-name").val(firstName).trigger("input");
+  }
+
+  initMultistepForm(".application-form-control");
+  initMultistepForm(".application-form-variant-a");
+
+  // Auto-open form if hash is #application
+  if (window.location.hash === "#application") {
+    document
+      .querySelectorAll(".appplication-form-modal")
+      .forEach((el) => (el.style.display = "flex"));
+    document.body.style.overflow = "hidden";
+    window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
+  }
 });
