@@ -204,13 +204,6 @@ function initMultistepForm(containerSelector) {
 
       currentStep += direction;
 
-      // ✅ SET STATUS TO COMPLETE ON FINAL STEP
-    if (currentStep === totalSteps - 1) {
-      container.find(".status").val("complete");
-    } else {
-      container.find(".status").val("partial");
-    }
-
       if (window.fathom) {
         window.trackedSteps = window.trackedSteps || new Set();
         if (!window.trackedSteps.has(currentStep)) {
