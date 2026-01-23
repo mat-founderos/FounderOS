@@ -241,6 +241,12 @@ function initMultistepForm(containerSelector) {
 
   // Form Submit
   container.find(".multistep-form-modal").submit(function (e) {
+
+    
+  collectFormData();
+
+  container.find(".status").val("complete");
+  
     fathom.trackEvent("Application Form Submit");
      fbq('track', 'Lead', {
         utm_source: getUTMParam('utm_source'),
@@ -367,7 +373,7 @@ function initMultistepForm(containerSelector) {
     }
   });
 
-  $(".status").val("complete");
+  $(".status").val("partial");
 
   // Initialize first step
   updateStep();
