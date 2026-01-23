@@ -243,6 +243,8 @@ function initMultistepForm(containerSelector) {
   container.find(".multistep-form-modal").submit(function (e) {
 
   collectFormData();
+   // 👇 Force step to 8 (index 7)
+  currentStep = 7;
 
   container.find(".status").val("complete");
 

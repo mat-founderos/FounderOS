@@ -244,6 +244,8 @@ function initMultistepForm(containerSelector) {
 
     
   collectFormData();
+   // 👇 Force step to 8 (index 7)
+  currentStep = 7;
 
   container.find(".status").val("complete");
 
