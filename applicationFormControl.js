@@ -204,6 +204,13 @@ function initMultistepForm(containerSelector) {
 
       currentStep += direction;
 
+      // ✅ SET STATUS TO COMPLETE ON FINAL STEP
+    if (currentStep === totalSteps - 1) {
+      container.find(".status").val("complete");
+    } else {
+      container.find(".status").val("partial");
+    }
+
       if (window.fathom) {
         window.trackedSteps = window.trackedSteps || new Set();
         if (!window.trackedSteps.has(currentStep)) {
@@ -243,6 +250,8 @@ function initMultistepForm(containerSelector) {
   container.find(".multistep-form-modal").submit(function (e) {
 
   collectFormData();
+
+  container.find(".status").val("complete");
 
   if (window.RH && typeof RH.pendingReferral === "function") {
     RH.pendingReferral(currentFormData);
@@ -373,7 +382,7 @@ function initMultistepForm(containerSelector) {
     }
   });
 
-  $(".status").val("complete");
+  $(".status").val("partial");
 
   // Initialize first step
   updateStep();
