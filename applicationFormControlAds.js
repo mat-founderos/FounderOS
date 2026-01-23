@@ -246,7 +246,20 @@ function initMultistepForm(containerSelector) {
   collectFormData();
 
   container.find(".status").val("complete");
+
+  // Optional: send a final partial/completion payload
+  fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "complete",
+      formData: currentFormData,
+      step: currentStep,
+      timestamp: new Date().toISOString(),
+    }),
+  });
   
+
     fathom.trackEvent("Application Form Submit");
      fbq('track', 'Lead', {
         utm_source: getUTMParam('utm_source'),

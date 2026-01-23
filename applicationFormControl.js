@@ -246,6 +246,18 @@ function initMultistepForm(containerSelector) {
 
   container.find(".status").val("complete");
 
+  // Optional: send a final partial/completion payload
+  fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "complete",
+      formData: currentFormData,
+      step: currentStep,
+      timestamp: new Date().toISOString(),
+    }),
+  });
+
   if (window.RH && typeof RH.pendingReferral === "function") {
     RH.pendingReferral(currentFormData);
   }
