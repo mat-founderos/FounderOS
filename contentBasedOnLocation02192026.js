@@ -143,12 +143,11 @@ async function redirectByCountryConfig(config = {}) {
   const code = await getCountryCode();
   const group = getCountryGroup(code);
 
-  // 👉 check hybrid bypass
-  const params = new URLSearchParams(window.location.search);
-  const hasHybridParam = params.get("hybrid") === "1";
+  // 👉 check cookie
+  const hasHybridBypass = document.cookie.includes("hybrid_bypass=true");
 
-  // If hybrid AND bypass present → treat as curated (no redirect)
-  if (group === "hybrid" && hasHybridParam) {
+  // If hybrid and cookie exists → allow access
+  if (group === "hybrid" && hasHybridBypass) {
     return;
   }
 
@@ -164,4 +163,5 @@ async function redirectByCountryConfig(config = {}) {
     window.location.replace(redirectUrl);
   }
 }
+
 
