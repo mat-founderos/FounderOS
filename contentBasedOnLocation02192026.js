@@ -143,6 +143,15 @@ async function redirectByCountryConfig(config = {}) {
   const code = await getCountryCode();
   const group = getCountryGroup(code);
 
+  // 👉 check hybrid bypass
+  const params = new URLSearchParams(window.location.search);
+  const hasHybridParam = params.get("hybrid") === "1";
+
+  // If hybrid AND bypass present → treat as curated (no redirect)
+  if (group === "hybrid" && hasHybridParam) {
+    return;
+  }
+
   const redirectMap = {
     curated,
     hybrid,
@@ -155,3 +164,4 @@ async function redirectByCountryConfig(config = {}) {
     window.location.replace(redirectUrl);
   }
 }
+
