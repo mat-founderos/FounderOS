@@ -143,25 +143,27 @@ async function redirectByCountryConfig(config = {}) {
   const code = await getCountryCode();
   const group = getCountryGroup(code);
 
-  // 👉 check cookie
   const hasHybridBypass = document.cookie.includes("hybrid_bypass=true");
 
-  // If hybrid and cookie exists → allow access
-  if (group === "hybrid" && hasHybridBypass) {
+  // 👉 if hybrid already allowed, do nothing
+  if (group === "hybrid" && hasHybridBypass) return;
+
+  // 👉 if hybrid and redirecting, store original path
+  if (group === "hybrid" && hybrid) {
+    document.cookie = `hybrid_target=${window.location.pathname}; path=/; max-age=1800`;
+    window.location.replace(hybrid);
     return;
   }
 
-  const redirectMap = {
-    curated,
-    hybrid,
-    nonCurated
-  };
+  if (group === "nonCurated" && nonCurated) {
+    window.location.replace(nonCurated);
+    return;
+  }
 
-  const redirectUrl = redirectMap[group];
-
-  if (redirectUrl) {
-    window.location.replace(redirectUrl);
+  if (group === "curated" && curated) {
+    window.location.replace(curated);
   }
 }
+
 
 
