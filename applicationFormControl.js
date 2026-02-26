@@ -289,7 +289,7 @@ function initMultistepForm(containerSelector) {
   container.find("#What-s-your-full-name").on("input", function () {
     const fullName = $(this).val().trim().split(" ");
     container.find("#first_name").val(fullName[0] || "");
-    container.find("#laste_name").val(fullName.slice(1).join(" ") || "");
+    container.find("#last_name").val(fullName.slice(1).join(" ") || "");
   });
 
   // Dynamic question text logic
