@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
   }
-
+  
   /* -----------------------------
      Get UTMs (URL → Cookie fallback)
   ----------------------------- */
@@ -99,14 +99,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
   /* -----------------------------
      EXAMPLE USAGE
-  ----------------------------- */
+  ----------------------------- 
 
   setupHubspotCTATracking({
     ctaClass: '.pbsp-cta',
     eventName: 'pe44306052_personal_brand_starter_pack_cta_click',
     lockKey: 'pbsp_cta_lock'
   });
-
+*/
   // You can reuse again like this:
   /*
   setupHubspotCTATracking({
