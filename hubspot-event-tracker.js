@@ -1,84 +1,73 @@
-(function() {
+(function () {
 
-  const LOCK_DURATION = 5 * 60 * 1000;
-
-  function getCookie(name) {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
-
-  function getUTMValues() {
-    const params = new URLSearchParams(window.location.search);
-    const keys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
-    const utms = {};
-
-    keys.forEach(key => {
-      utms[key] = params.get(key) || getCookie(key) || null;
-    });
-
-    return utms;
-  }
-
-  function identifyFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    const email = params.get('email');
-
-    if (email) {
-      var _hsq = window._hsq = window._hsq || [];
-      _hsq.push(['identify', { email }]);
-    }
-
-    return email;
-  }
-
-  const utmData = getUTMValues();
-  const userEmail = identifyFromURL();
-
-  function setupHubspotCTATracking({
+  window.setupHubspotCTATracking = function ({
     ctaClass,
     eventName,
-    lockKey,
-    extraProperties = {}
+    lockKey = "hs_cta_event_lock",
+    lockDuration = 5 * 60 * 1000 // 5 minutes
   }) {
 
-    const buttons = document.querySelectorAll(ctaClass);
-    if (!buttons.length) return;
+    if (!ctaClass || !eventName) {
+      console.warn("HubSpot CTA Tracking: Missing required params");
+      return;
+    }
+
+    const LOCK_KEY = lockKey;
+    const LOCK_DURATION = lockDuration;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get("email");
+
+    // Identify user if email exists
+    if (userEmail) {
+      var _hsq = (window._hsq = window._hsq || []);
+      _hsq.push(["identify", { email: userEmail }]);
+      console.log("HubSpot identified user:", userEmail);
+    }
 
     function canFireEvent() {
-      const lastFired = sessionStorage.getItem(lockKey);
+      const lastFired = sessionStorage.getItem(LOCK_KEY);
       if (!lastFired) return true;
-      return Date.now() - parseInt(lastFired, 10) > LOCK_DURATION;
+
+      const now = Date.now();
+      return now - parseInt(lastFired, 10) > LOCK_DURATION;
     }
 
     function setEventLock() {
-      sessionStorage.setItem(lockKey, Date.now());
+      sessionStorage.setItem(LOCK_KEY, Date.now());
     }
 
-    buttons.forEach(btn => {
-      btn.addEventListener("click", function() {
+    const ctaButtons = document.querySelectorAll(ctaClass);
 
-        if (!canFireEvent()) return;
+    if (!ctaButtons.length) {
+      console.warn("HubSpot CTA Tracking: No elements found for", ctaClass);
+      return;
+    }
 
-        var _hsq = window._hsq = window._hsq || [];
+    ctaButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+
+        if (!canFireEvent()) {
+          console.log("CTA event blocked (duplicate within lock window)");
+          return;
+        }
+
+        var _hsq = (window._hsq = window._hsq || []);
         _hsq.push([
-          'trackCustomBehavioralEvent',
+          "trackCustomBehavioralEvent",
           {
             name: eventName,
             properties: {
               email: userEmail,
-              page_url: window.location.href,
-              ...utmData,
-              ...extraProperties
+              page_url: window.location.href
             }
           }
         ]);
 
         setEventLock();
+        console.log("HubSpot event sent:", eventName);
       });
     });
-  }
-
-  // 🔥 expose globally
-  window.setupHubspotCTATracking = setupHubspotCTATracking;
+  };
 
 })();
