@@ -165,5 +165,55 @@ async function redirectByCountryConfig(config = {}) {
   }
 }
 
+/* =========================
+   UPDATE SINGLE TEXT
+========================= */
 
+async function updateText(className, values) {
+  if (!className || !values) return;
 
+  const code = await getCountryCode();
+  const group = getCountryGroup(code);
+
+  const text =
+    values[group] ??
+    values.default ??
+    null;
+
+  if (!text) return;
+
+  document.querySelectorAll(`.${className}`).forEach(el => {
+    el.textContent = text;
+  });
+
+  console.log(`Text updated → ${className} (${group})`);
+}
+
+/* =========================
+   UPDATE SINGLE LINK
+========================= */
+async function updateLink(className, values) {
+  if (!className || !values) return;
+
+  const code = await getCountryCode();
+  const group = getCountryGroup(code);
+
+  const url =
+    values[group] ??
+    values.default ??
+    null;
+
+  if (!url) return;
+
+  document.querySelectorAll(`.${className}`).forEach(el => {
+
+    if (el.tagName === "A") {
+      el.href = url;
+    } else {
+      el.addEventListener("click", () => {
+        window.location.href = url;
+      });
+    }
+  });
+  console.log(`Link updated → ${className} (${group})`);
+}
