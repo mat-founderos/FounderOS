@@ -44,7 +44,7 @@
   }
 
   function getDecisionAuthority(form) {
-    const el = form.querySelector('[name="application_decision_authority"]:checked');
+    const el = form.querySelector('[name="When-it-comes-to-investing-in-your-business-growth-who-s-involved-in-making-that-decision"]:checked');
     return el ? el.value : null;
   }
 
