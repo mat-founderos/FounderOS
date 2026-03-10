@@ -1,6 +1,6 @@
 /* =====================================
    Founder OS Application Routing v2
-   With Calendly Redirects
+   With Calendly Redirect + Parameters
 ===================================== */
 
 (function () {
@@ -20,6 +20,18 @@
     setter: "https://calendly.com/d/cw2s-j7z-zyk/intro-call",
     nurture: "/not-a-fit?dq=not_ready"
   };
+
+  const PARAM_FIELDS = [
+    "email",
+    "first_name",
+    "last_name",
+    "phone",
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content"
+  ];
 
   function calculateScore(form) {
     let total = 0;
@@ -82,6 +94,20 @@
     return ROUTE_URLS[route] || ROUTE_URLS.nurture;
   }
 
+  function collectParams(form) {
+
+    const params = new URLSearchParams();
+
+    PARAM_FIELDS.forEach(field => {
+      const el = form.querySelector(`#${field}, [name="${field}"]`);
+      if (el && el.value) {
+        params.append(field, el.value);
+      }
+    });
+
+    return params.toString();
+  }
+
   function setHiddenField(form, name, value) {
     const field = form.querySelector(`[name="${name}"]`);
     if (field) field.value = value;
@@ -106,14 +132,19 @@
           disqualifier
         );
 
-        const redirectUrl = getRedirect(route, disqualifier);
+        const baseRedirect = getRedirect(route, disqualifier);
+
+        const paramString = collectParams(form);
+
+        const finalRedirect =
+          paramString ? `${baseRedirect}?${paramString}` : baseRedirect;
 
         setHiddenField(form, "application_score", score);
         setHiddenField(form, "application_route", route);
         setHiddenField(form, "application_disqualifier", disqualifier);
 
-        if (redirectUrl) {
-          window.__dynamicRedirectUrl = redirectUrl;
+        if (finalRedirect) {
+          window.__dynamicRedirectUrl = finalRedirect;
         }
 
         if (debug) {
@@ -121,7 +152,7 @@
           console.log("Decision Authority:", decisionAuthority);
           console.log("Disqualifier:", disqualifier);
           console.log("Route:", route);
-          console.log("Redirect:", redirectUrl);
+          console.log("Redirect:", finalRedirect);
         }
 
       }
