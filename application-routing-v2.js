@@ -12,7 +12,7 @@
 
   const HARD_DISQUALIFIERS = [
     "pre_revenue",
-    "procurement_required"
+    "procurement"
   ];
 
   const ROUTE_URLS = {
@@ -87,7 +87,7 @@
       return "/not-a-fit?dq=pre_revenue";
     }
 
-    if (disqualifier === "procurement_required") {
+    if (disqualifier === "procurement") {
       return "/not-a-fit?dq=procurement";
     }
 
@@ -168,3 +168,5 @@
   };
 
 })();
+
+    
