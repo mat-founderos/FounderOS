@@ -16,8 +16,8 @@
   ];
 
   const ROUTE_URLS = {
-    direct_to_closer: "/book?route=closer",
-    setter: "/book?route=setter",
+    direct_to_closer: "/book-now?route=closer",
+    setter: "/book-now?route=setter",
     nurture: "/fos-light-offer?dq=not_ready"
   };
 
