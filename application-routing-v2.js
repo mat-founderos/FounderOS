@@ -12,7 +12,7 @@
 
   const HARD_DISQUALIFIERS = [
     "pre_revenue",
-    "procurement"
+    "procurement_required"
   ];
 
   const ROUTE_URLS = {
@@ -87,7 +87,7 @@
       return "/fos-light-offer?dq=pre_revenue";
     }
 
-    if (disqualifier === "procurement") {
+    if (disqualifier === "procurement_required") {
       return "/fos-light-offer?dq=procurement";
     }
 
