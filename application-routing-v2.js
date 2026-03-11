@@ -16,9 +16,9 @@
   ];
 
   const ROUTE_URLS = {
-    direct_to_closer: "https://calendly.com/d/cxqn-5hd-8fz/brand-strategy-call",
-    setter: "https://calendly.com/d/cw2s-j7z-zyk/intro-call",
-    nurture: "/not-a-fit?dq=not_ready"
+    direct_to_closer: "/book?route=closer",
+    setter: "/book?route=setter",
+    nurture: "/fos-light-offer?dq=not_ready"
   };
 
   const PARAM_FIELDS = [
@@ -84,37 +84,29 @@
   function getRedirect(route, disqualifier) {
 
     if (disqualifier === "pre_revenue") {
-      return "/not-a-fit?dq=pre_revenue";
+      return "/fos-light-offer?dq=pre_revenue";
     }
 
     if (disqualifier === "procurement") {
-      return "/not-a-fit?dq=procurement";
+      return "/fos-light-offer?dq=procurement";
     }
 
     return ROUTE_URLS[route] || ROUTE_URLS.nurture;
   }
 
-  function collectParams(form, route, disqualifier) {
+  function collectParams(form) {
 
-  const params = new URLSearchParams();
+    const params = new URLSearchParams();
 
-  PARAM_FIELDS.forEach(field => {
-    const el = form.querySelector(`#${field}, [name="${field}"]`);
-    if (el && el.value) {
-      params.append(field, el.value);
-    }
-  });
+    PARAM_FIELDS.forEach(field => {
+      const el = form.querySelector(`#${field}, [name="${field}"]`);
+      if (el && el.value) {
+        params.append(field, el.value);
+      }
+    });
 
-  if (route) {
-    params.append("route", route);
+    return params.toString();
   }
-
-  if (disqualifier && disqualifier !== "none") {
-    params.append("disqualifier", disqualifier);
-  }
-
-  return params.toString();
-}
 
   function setHiddenField(form, name, value) {
     const field = form.querySelector(`[name="${name}"]`);
@@ -142,7 +134,7 @@
 
         const baseRedirect = getRedirect(route, disqualifier);
 
-        const paramString = collectParams(form, route, disqualifier);
+        const paramString = collectParams(form);
 
         const finalRedirect =
           paramString ? `${baseRedirect}?${paramString}` : baseRedirect;
