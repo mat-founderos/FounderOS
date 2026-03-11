@@ -94,19 +94,27 @@
     return ROUTE_URLS[route] || ROUTE_URLS.nurture;
   }
 
-  function collectParams(form) {
+  function collectParams(form, route, disqualifier) {
 
-    const params = new URLSearchParams();
+  const params = new URLSearchParams();
 
-    PARAM_FIELDS.forEach(field => {
-      const el = form.querySelector(`#${field}, [name="${field}"]`);
-      if (el && el.value) {
-        params.append(field, el.value);
-      }
-    });
+  PARAM_FIELDS.forEach(field => {
+    const el = form.querySelector(`#${field}, [name="${field}"]`);
+    if (el && el.value) {
+      params.append(field, el.value);
+    }
+  });
 
-    return params.toString();
+  if (route) {
+    params.append("route", route);
   }
+
+  if (disqualifier && disqualifier !== "none") {
+    params.append("disqualifier", disqualifier);
+  }
+
+  return params.toString();
+}
 
   function setHiddenField(form, name, value) {
     const field = form.querySelector(`[name="${name}"]`);
@@ -134,7 +142,7 @@
 
         const baseRedirect = getRedirect(route, disqualifier);
 
-        const paramString = collectParams(form);
+        const paramString = collectParams(form, route, disqualifier);
 
         const finalRedirect =
           paramString ? `${baseRedirect}?${paramString}` : baseRedirect;
