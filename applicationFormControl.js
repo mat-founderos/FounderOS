@@ -240,11 +240,15 @@ function initMultistepForm(containerSelector) {
   });
 
   // Form Submit
-  container.find(".multistep-form-modal").submit(function (e) {
-
+container.find(".multistep-form-modal").submit(function (e) {
   collectFormData();
-   // 👇 Force step to 8 (index 7)
-  currentStep = 7;
+
+  // Check form ID
+  if ($(this).attr("id") === "application-form-03102026") {
+    currentStep = 10;
+  } else {
+    currentStep = 7;
+  }
 
   container.find(".status").val("complete");
 
@@ -263,8 +267,9 @@ function initMultistepForm(containerSelector) {
   if (window.RH && typeof RH.pendingReferral === "function") {
     RH.pendingReferral(currentFormData);
   }
-    fathom.trackEvent("Application Form Submit");
-  });
+
+  fathom.trackEvent("Application Form Submit");
+});
 
   // Checkbox background logic
   container.find(".multistep-choice-checkbox input").change(function () {
