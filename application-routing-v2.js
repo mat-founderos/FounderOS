@@ -137,7 +137,9 @@
         const paramString = collectParams(form);
 
         const finalRedirect =
-          paramString ? `${baseRedirect}?${paramString}` : baseRedirect;
+        paramString
+        ? `${baseRedirect}${baseRedirect.includes("?") ? "&" : "?"}${paramString}`
+        : baseRedirect;
 
         setHiddenField(form, "application_score", score);
         setHiddenField(form, "application_route", route);
