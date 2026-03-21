@@ -15,9 +15,9 @@
   ];
 
   const ROUTE_URLS = {
-    direct_to_closer: "/apply/next-steps",
-    setter: "/apply/next-steps",
-    nurture: "/apply/next-steps"
+    direct_to_closer: "https://aria.founderos.com",
+    setter: "https://aria.founderos.com",
+    nurture: "https://aria.founderos.com"
   };
 
   const PARAM_FIELDS = [
