@@ -359,7 +359,7 @@ container.find(".multistep-form-modal").submit(function (e) {
     e.preventDefault(); // 👈 ADD THIS
     document
       .querySelectorAll(".appplication-form-modal")
-      .forEach((el) => (el.style.display = "flex"));
+      .forEach((el) => (el.style.display = "block"));
     document.body.style.overflow = "hidden";
     window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
   }
@@ -447,7 +447,7 @@ $(document).ready(function () {
   if (window.location.hash === "#application") {
     document
       .querySelectorAll(".appplication-form-modal")
-      .forEach((el) => (el.style.display = "flex"));
+      .forEach((el) => (el.style.display = "block"));
     document.body.style.overflow = "hidden";
     window.fathom && fathom.trackEvent("Application Form Submit (Step: 1)");
   }
