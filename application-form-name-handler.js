@@ -15,6 +15,13 @@
     return source ? source.toLowerCase() : null;
   }
 
+  function normalizeFormName(name) {
+    return 'wf-form-' + name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // remove special chars
+      .replace(/\s+/g, '-'); // spaces to dash
+  }
+
   function run(config) {
     if (!config || !config.formClass || !config.sourceMap) return;
 
@@ -28,13 +35,21 @@
     if (!mappedName) return; // do nothing if not matched
 
     forms.forEach(form => {
-      const field = form.querySelector(`[name="${config.fieldName || 'form_name'}"]`);
-      if (field) {
-        field.value = mappedName;
-      }
+      // update Webflow attributes
+      form.setAttribute('data-name', mappedName);
+      form.setAttribute('aria-label', mappedName);
+
+      // update form name safely
+      form.setAttribute('name', normalizeFormName(mappedName));
     });
 
-    console.log('[Form Name Handler]', { utmSource });
+    // optional debug
+    if (config.debug) {
+      console.log('[Form Name Updated]', {
+        utmSource,
+        newName: mappedName
+      });
+    }
   }
 
   // expose globally
