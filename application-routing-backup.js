@@ -1,66 +1,174 @@
 /* =====================================
-   APPLICATION ROUTING ENGINE
-   Version: 1.0
-   Works with setupReCAPTCHAForm
+   Founder OS Application Routing v2
+   With Calendly Redirect + Parameters
 ===================================== */
 
 (function () {
 
+  const SCORE_THRESHOLDS = {
+    direct: 19,
+    setter: 11
+  };
+
+  const HARD_DISQUALIFIERS = [
+    "pre_revenue",
+    "procurement_required"
+  ];
+
+  const ROUTE_URLS = {
+    direct_to_closer: "/book-now?route=closer",
+    setter: "/book-now?route=setter",
+    nurture: "/fos-light-offer?dq=not_ready"
+  };
+
+  const PARAM_FIELDS = [
+    "email",
+    "first_name",
+    "last_name",
+    "phone",
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content"
+  ];
+
   function calculateScore(form) {
     let total = 0;
 
-    const checkedInputs = form.querySelectorAll(
-      "input:checked, option:checked"
-    );
-
-    checkedInputs.forEach(el => {
-      const score = Number(el.dataset.score || 0);
-      total += score;
+    form.querySelectorAll("input:checked, option:checked").forEach(el => {
+      total += Number(el.dataset.score || 0);
     });
 
     return total;
   }
 
-  function getTier(score, tiers) {
-    return tiers.find(
-      tier => score >= tier.min && score <= tier.max
-    );
+  function getDecisionAuthority(form) {
+    const el = form.querySelector('[name="When-it-comes-to-investing-in-your-business-growth-who-s-involved-in-making-that-decision"]:checked');
+    return el ? el.value : null;
   }
 
-  function buildRedirectResolver({ tiers, debug }) {
+  function getDisqualifier(form) {
+    let dq = "none";
 
-    return function (form) {
+    form.querySelectorAll("input:checked").forEach(el => {
+      const disq = el.dataset.disqualifier;
+      if (HARD_DISQUALIFIERS.includes(disq)) {
+        dq = disq;
+      }
+    });
 
-      try {
+    return dq;
+  }
+
+  function determineRoute(score, decisionAuthority, disqualifier) {
+
+    if (disqualifier !== "none") {
+      return "nurture";
+    }
+
+    if (
+      score >= SCORE_THRESHOLDS.direct &&
+      decisionAuthority === "just_me"
+    ) {
+      return "direct_to_closer";
+    }
+
+    if (score >= SCORE_THRESHOLDS.setter) {
+      return "setter";
+    }
+
+    return "nurture";
+  }
+
+  function getRedirect(route, disqualifier) {
+
+    if (disqualifier === "pre_revenue") {
+      return "/fos-light-offer?dq=pre_revenue";
+    }
+
+    if (disqualifier === "procurement_required") {
+      return "/fos-light-offer?dq=procurement";
+    }
+
+    return ROUTE_URLS[route] || ROUTE_URLS.nurture;
+  }
+
+  function collectParams(form) {
+
+    const params = new URLSearchParams();
+
+    PARAM_FIELDS.forEach(field => {
+      const el = form.querySelector(`#${field}, [name="${field}"]`);
+      if (el && el.value) {
+        params.append(field, el.value);
+      }
+    });
+
+    return params.toString();
+  }
+
+  function setHiddenField(form, name, value) {
+    const field = form.querySelector(`[name="${name}"]`);
+    if (field) field.value = value;
+  }
+
+  window.initApplicationRouting = function ({
+    formSelector,
+    debug = false
+  }) {
+
+    document.querySelectorAll(formSelector).forEach(form => {
+
+      function updateRouting() {
+
         const score = calculateScore(form);
-        const tier = getTier(score, tiers);
+        const decisionAuthority = getDecisionAuthority(form);
+        const disqualifier = getDisqualifier(form);
 
-        if (!tier) {
-          console.warn("No tier matched. Redirecting to root.");
-          return "/";
+        const route = determineRoute(
+          score,
+          decisionAuthority,
+          disqualifier
+        );
+
+        const baseRedirect = getRedirect(route, disqualifier);
+
+        const paramString = collectParams(form);
+
+        const finalRedirect =
+        paramString
+        ? `${baseRedirect}${baseRedirect.includes("?") ? "&" : "?"}${paramString}`
+        : baseRedirect;
+
+        setHiddenField(form, "application_score", score);
+        setHiddenField(form, "application_route", route);
+        setHiddenField(form, "application_disqualifier", disqualifier);
+
+        if (finalRedirect) {
+          window.__dynamicRedirectUrl = finalRedirect;
         }
 
         if (debug) {
-          console.log("Application Score:", score);
-          console.log("Matched Tier:", tier.name);
-          console.log("Redirect URL:", tier.url);
+          console.log("Score:", score);
+          console.log("Decision Authority:", decisionAuthority);
+          console.log("Disqualifier:", disqualifier);
+          console.log("Route:", route);
+          console.log("Redirect:", finalRedirect);
         }
 
-        return tier.url;
-
-      } catch (err) {
-        console.error("Routing error:", err);
-        return "/";
       }
-    };
-  }
 
-  // expose global init
-  window.createApplicationRedirectResolver = function ({
-    tiers = [],
-    debug = false
-  }) {
-    return buildRedirectResolver({ tiers, debug });
+      form.querySelectorAll("input, select").forEach(el => {
+        el.addEventListener("change", updateRouting);
+      });
+
+      updateRouting();
+
+    });
+
   };
 
 })();
+
+    

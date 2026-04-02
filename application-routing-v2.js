@@ -1,6 +1,7 @@
 /* =====================================
    Founder OS Application Routing v2
    With Calendly Redirect + Parameters
+   + UTM आधारित Route Modifier (NEW)
 ===================================== */
 
 (function () {
@@ -32,6 +33,34 @@
     "utm_term",
     "utm_content"
   ];
+
+  /* ================================
+     NEW: UTM ROUTE CONFIG
+  ================================= */
+  const UTM_ROUTE_MAP = {
+    meta: "_ads",
+    //facebook: "_ads",
+    //instagram: "_ads"
+    // easy to extend:
+    // google: "_google",
+    // youtube: "_yt"
+  };
+
+  function getUTMSource() {
+    const params = new URLSearchParams(window.location.search);
+    let source = params.get("utm_source");
+
+    if (!source) {
+      source = sessionStorage.getItem("utm_source");
+    }
+
+    if (!source) {
+      const match = document.cookie.match(/(?:^|; )utm_source=([^;]*)/);
+      source = match ? decodeURIComponent(match[1]) : null;
+    }
+
+    return source ? source.toLowerCase() : null;
+  }
 
   function calculateScore(form) {
     let total = 0;
@@ -113,6 +142,34 @@
     if (field) field.value = value;
   }
 
+  /* ================================
+     NEW: ROUTE MODIFIER VIA UTM
+  ================================= */
+  function adjustRouteByUTM(url) {
+    if (!url) return url;
+
+    const utmSource = getUTMSource();
+    if (!utmSource) return url;
+
+    const suffix = UTM_ROUTE_MAP[utmSource];
+    if (!suffix) return url;
+
+    const urlObj = new URL(url, window.location.origin);
+    const route = urlObj.searchParams.get("route");
+
+    if (!route) return url;
+
+    if (route === "setter") {
+      urlObj.searchParams.set("route", "setter" + suffix);
+    }
+
+    if (route === "closer") {
+      urlObj.searchParams.set("route", "closer" + suffix);
+    }
+
+    return urlObj.pathname + "?" + urlObj.searchParams.toString();
+  }
+
   window.initApplicationRouting = function ({
     formSelector,
     debug = false
@@ -133,13 +190,15 @@
         );
 
         const baseRedirect = getRedirect(route, disqualifier);
-
         const paramString = collectParams(form);
 
-        const finalRedirect =
+        let finalRedirect =
         paramString
         ? `${baseRedirect}${baseRedirect.includes("?") ? "&" : "?"}${paramString}`
         : baseRedirect;
+
+        /* ✅ ONLY ADDITION */
+        finalRedirect = adjustRouteByUTM(finalRedirect);
 
         setHiddenField(form, "application_score", score);
         setHiddenField(form, "application_route", route);
@@ -151,9 +210,8 @@
 
         if (debug) {
           console.log("Score:", score);
-          console.log("Decision Authority:", decisionAuthority);
-          console.log("Disqualifier:", disqualifier);
           console.log("Route:", route);
+          console.log("UTM Source:", getUTMSource());
           console.log("Redirect:", finalRedirect);
         }
 
@@ -170,5 +228,3 @@
   };
 
 })();
-
-    
