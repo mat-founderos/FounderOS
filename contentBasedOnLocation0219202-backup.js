@@ -85,25 +85,7 @@ function getCountryGroup(code) {
   if (hybridCountries.includes(code)) return "hybrid";
   if (nonCuratedCountries.includes(code)) return "nonCurated";
 
-  return "nonCurated";
-}
-
-
-/* =========================
-   QUERY PARAM HELPER
-========================= */
-
-function getQueryString() {
-  return window.location.search || "";
-}
-
-function appendParams(url) {
-  const query = getQueryString();
-  if (!query) return url;
-
-  return url.includes("?")
-    ? url + "&" + query.substring(1)
-    : url + query;
+  return "nonCurated"; // default fallback
 }
 
 
@@ -148,7 +130,7 @@ getPageCategory().then(group => {
 
 
 /* =========================
-   REDIRECT LOGIC (UPDATED)
+   REDIRECT LOGIC
 ========================= */
 
 async function redirectByCountryConfig(config = {}) {
@@ -166,23 +148,22 @@ async function redirectByCountryConfig(config = {}) {
   // 👉 if hybrid already allowed, do nothing
   if (group === "hybrid" && hasHybridBypass) return;
 
-  // 👉 if hybrid and redirecting
+  // 👉 if hybrid and redirecting, store original path
   if (group === "hybrid" && hybrid) {
-    document.cookie = `hybrid_target=${window.location.pathname + getQueryString()}; path=/; max-age=1800`;
-    window.location.replace(appendParams(hybrid));
+    document.cookie = `hybrid_target=${window.location.pathname}; path=/; max-age=1800`;
+    window.location.replace(hybrid);
     return;
   }
 
   if (group === "nonCurated" && nonCurated) {
-    window.location.replace(appendParams(nonCurated));
+    window.location.replace(nonCurated);
     return;
   }
 
   if (group === "curated" && curated) {
-    window.location.replace(appendParams(curated));
+    window.location.replace(curated);
   }
 }
-
 
 /* =========================
    UPDATE SINGLE TEXT
@@ -208,35 +189,31 @@ async function updateText(className, values) {
   console.log(`Text updated → ${className} (${group})`);
 }
 
-
 /* =========================
    UPDATE SINGLE LINK
 ========================= */
-
 async function updateLink(className, values) {
   if (!className || !values) return;
 
   const code = await getCountryCode();
   const group = getCountryGroup(code);
 
-  const baseUrl =
+  const url =
     values[group] ??
     values.default ??
     null;
 
-  if (!baseUrl) return;
-
-  const finalUrl = appendParams(baseUrl);
+  if (!url) return;
 
   document.querySelectorAll(`.${className}`).forEach(el => {
+
     if (el.tagName === "A") {
-      el.href = finalUrl;
+      el.href = url;
     } else {
       el.addEventListener("click", () => {
-        window.location.href = finalUrl;
+        window.location.href = url;
       });
     }
   });
-
   console.log(`Link updated → ${className} (${group})`);
 }
