@@ -92,23 +92,30 @@
 
   function determineRoute(score, decisionAuthority, disqualifier) {
 
-    if (disqualifier !== "none") {
-      return "nurture";
-    }
+  const utmSource = getUTMSource();
 
-    if (
-      score >= SCORE_THRESHOLDS.direct &&
-      decisionAuthority === "just_me"
-    ) {
-      return "direct_to_closer";
-    }
+  // 🔥 FORCE META TRAFFIC TO SETTER
+  if (utmSource === "meta") {
+    return "setter";
+  }
 
-    if (score >= SCORE_THRESHOLDS.setter) {
-      return "setter";
-    }
-
+  if (disqualifier !== "none") {
     return "nurture";
   }
+
+  if (
+    score >= SCORE_THRESHOLDS.direct &&
+    decisionAuthority === "just_me"
+  ) {
+    return "direct_to_closer";
+  }
+
+  if (score >= SCORE_THRESHOLDS.setter) {
+    return "setter";
+  }
+
+  return "nurture";
+}
 
   function getRedirect(route, disqualifier) {
 
