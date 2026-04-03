@@ -92,43 +92,50 @@
 
   function determineRoute(score, decisionAuthority, disqualifier) {
 
-  const utmSource = getUTMSource();
+    if (disqualifier !== "none") {
+      return "nurture";
+    }
 
-  // 🔥 FORCE META TRAFFIC TO SETTER
-  if (utmSource === "meta") {
-    return "setter";
-  }
+    if (
+      score >= SCORE_THRESHOLDS.direct &&
+      decisionAuthority === "just_me"
+    ) {
+      return "direct_to_closer";
+    }
 
-  if (disqualifier !== "none") {
+    if (score >= SCORE_THRESHOLDS.setter) {
+      return "setter";
+    }
+
     return "nurture";
   }
 
-  if (
-    score >= SCORE_THRESHOLDS.direct &&
-    decisionAuthority === "just_me"
-  ) {
-    return "direct_to_closer";
-  }
-
-  if (score >= SCORE_THRESHOLDS.setter) {
-    return "setter";
-  }
-
-  return "nurture";
-}
-
   function getRedirect(route, disqualifier) {
 
-    if (disqualifier === "pre_revenue") {
-      return "/fos-light-offer?dq=pre_revenue";
-    }
+  const utmSource = getUTMSource();
 
-    if (disqualifier === "procurement_required") {
-      return "/fos-light-offer?dq=procurement";
-    }
+  // 🔥 META LOGIC (SMART OVERRIDE)
+  if (utmSource === "meta") {
 
-    return ROUTE_URLS[route] || ROUTE_URLS.nurture;
+    // If qualified for closer → keep closer
+    if (route === "direct_to_closer") {
+      return "/book-now?route=closer_ads";
+    }
+    // Everything else → setter (even if disqualified)
+    return "/book-now?route=setter_ads";
   }
+
+  // Default logic (non-meta)
+  if (disqualifier === "pre_revenue") {
+    return "/fos-light-offer?dq=pre_revenue";
+  }
+
+  if (disqualifier === "procurement_required") {
+    return "/fos-light-offer?dq=procurement";
+  }
+
+  return ROUTE_URLS[route] || ROUTE_URLS.nurture;
+}
 
   function collectParams(form) {
 
