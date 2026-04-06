@@ -96,10 +96,11 @@ text-align: center;
 }
 
 div[q\:slot="load-btn"] button {
-    border: 1px solid #d9fc67;
-    background-color: #d9fc67;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    padding: 15px 40px;
-    text-transform: uppercase;
+    border: 1px solid #d9fc67!important;
+    background-color: #d9fc67!important;
+    font-family: 'Inter', sans-serif!important;
+    font-size: 14px!important;
+    padding: 15px 40px!important;
+    text-transform: uppercase!important;
+    font-weight: 600 !important;
 }
