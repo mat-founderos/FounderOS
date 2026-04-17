@@ -8,7 +8,7 @@
 (function () {
 
   var UTM_PARAMS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
-  var HSA_PARAMS = ["hsa_cam", "hsa_grp", "hsa_ad", "hsa_src", "hsa_net"];
+  var HSA_PARAMS = ["hsa_acc", "hsa_cam", "hsa_grp", "hsa_ad", "hsa_src", "hsa_net"];
   var CLICK_IDS = ["fbclid"];
   var ALL_PARAMS = UTM_PARAMS.concat(HSA_PARAMS).concat(CLICK_IDS);
   var COOKIE_DAYS = 30;
