@@ -1,18 +1,8 @@
 (function () {
+  /* Read utm_source from cookie set by utmScript.js (single source of truth) */
   function getUTMSource() {
-    const params = new URLSearchParams(window.location.search);
-    let source = params.get('utm_source');
-
-    if (!source) {
-      source = sessionStorage.getItem('utm_source');
-    }
-
-    if (!source) {
-      const match = document.cookie.match(/(?:^|; )utm_source=([^;]*)/);
-      source = match ? decodeURIComponent(match[1]) : null;
-    }
-
-    return source ? source.toLowerCase() : null;
+    var match = document.cookie.match(/(?:^|; )utm_source=([^;]*)/);
+    return match ? decodeURIComponent(match[1]).toLowerCase() : null;
   }
 
   function normalizeFormName(name) {

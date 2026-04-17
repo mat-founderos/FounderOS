@@ -229,26 +229,21 @@ function initMultistepForm(containerSelector) {
   // Choice Handler
   container.find(".multistep-choice").change(function () {
     if (container.find("#first-question-no").is(":checked")) {
-      window.location.href = "/revenue-accelerator";
+      window.location.href = "/fos-light-offer";
     } else {
       goToStep(1);
     }
   });
 
   container.find("#first-question-no").on("click", function () {
-    window.location.href = "/revenue-accelerator";
+    window.location.href = "/fos-light-offer";
   });
 
   // Form Submit
 container.find(".multistep-form-modal").submit(function (e) {
   collectFormData();
 
-  // Check form ID
-  if ($(this).attr("id") === "application-form-03102026") {
-    currentStep = 10;
-  } else {
-    currentStep = 7;
-  }
+  currentStep = 7;
 
   container.find(".status").val("complete");
 
