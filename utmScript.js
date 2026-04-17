@@ -1,1 +1,104 @@
-function getParameterByName(e){let t=location.search.match(RegExp("[?&]"+e+"=([^&]*)"));return t?decodeURIComponent(t[1].replace(/\+/g," ")):null}function saveUtmsToStorage(){let e=new Date(Date.now()+864e5).toUTCString();["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(t=>{let a=getParameterByName(t);if(a){try{document.cookie=`${t}=${a}; path=/; expires=${e}`}catch(r){}try{sessionStorage.setItem(t,a)}catch(n){}}})}function getStoredValue(e){let t=document.cookie.match(RegExp("(^| )"+e+"=([^;]+)"));if(t)return decodeURIComponent(t[2]);try{return sessionStorage.getItem(e)}catch(a){return null}}function populateHiddenFields(){["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(e=>{let t=getParameterByName(e)||getStoredValue(e);if(t){let a=document.querySelectorAll(`input[name="${e}"]`);a.forEach(e=>{e.value=t})}})}document.addEventListener("DOMContentLoaded",function(){saveUtmsToStorage(),populateHiddenFields()});
+/* ========================================
+   Founder OS - UTM & Click ID Persistence
+   Captures UTMs + fbclid on landing,
+   persists in 30-day cookies, populates
+   hidden form fields on every page load.
+   ======================================== */
+
+(function () {
+
+  var UTM_PARAMS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+  var CLICK_IDS = ["fbclid"];
+  var ALL_PARAMS = UTM_PARAMS.concat(CLICK_IDS);
+  var COOKIE_DAYS = 30;
+
+  /* ---- Read URL param (anti-fragile, handles hash/encoding edge cases) ---- */
+
+  function getParam(name) {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      return params.get(name) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /* ---- Cookie helpers ---- */
+
+  function setCookie(name, value, days) {
+    var expires = new Date(Date.now() + days * 86400000).toUTCString();
+    document.cookie = name + "=" + encodeURIComponent(value) + "; path=/; expires=" + expires + "; SameSite=Lax";
+  }
+
+  function getCookie(name) {
+    var match = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  /* ---- sessionStorage helpers (backup layer) ---- */
+
+  function setSession(name, value) {
+    try { sessionStorage.setItem(name, value); } catch (e) {}
+  }
+
+  function getSession(name) {
+    try { return sessionStorage.getItem(name); } catch (e) { return null; }
+  }
+
+  /* ---- Save params from URL to cookie + sessionStorage ---- */
+
+  function saveParams() {
+    ALL_PARAMS.forEach(function (key) {
+      var value = getParam(key);
+      if (value) {
+        setCookie(key, value, COOKIE_DAYS);
+        setSession(key, value);
+      }
+    });
+  }
+
+  /* ---- Get stored value: URL param > cookie > sessionStorage ---- */
+
+  function getStored(name) {
+    return getParam(name) || getCookie(name) || getSession(name);
+  }
+
+  /* ---- Populate all matching hidden form fields ---- */
+
+  function populateFields() {
+    ALL_PARAMS.forEach(function (key) {
+      var value = getStored(key);
+      if (value) {
+        var fields = document.querySelectorAll('input[name="' + key + '"]');
+        for (var i = 0; i < fields.length; i++) {
+          fields[i].value = value;
+        }
+      }
+    });
+
+    /* Map fbclid to HubSpot's hs_facebook_click_id property.
+       Injects the hidden field if it doesn't exist in the form. */
+    var fbclid = getStored("fbclid");
+    if (fbclid) {
+      var forms = document.querySelectorAll("form");
+      for (var i = 0; i < forms.length; i++) {
+        var field = forms[i].querySelector('input[name="hs_facebook_click_id"]');
+        if (!field) {
+          field = document.createElement("input");
+          field.type = "hidden";
+          field.name = "hs_facebook_click_id";
+          forms[i].appendChild(field);
+        }
+        field.value = fbclid;
+      }
+    }
+  }
+
+  /* ---- Init on DOM ready ---- */
+
+  document.addEventListener("DOMContentLoaded", function () {
+    saveParams();
+    populateFields();
+  });
+
+})();
