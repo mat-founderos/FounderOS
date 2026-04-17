@@ -244,7 +244,7 @@ container.find(".multistep-form-modal").submit(function (e) {
   collectFormData();
 
   // Check form ID
-  if ($(this).attr("id") === "application-form-03102026") {
+  if ($(this).attr("id") === "fos-application-main") {
     currentStep = 10;
   } else {
     currentStep = 7;
