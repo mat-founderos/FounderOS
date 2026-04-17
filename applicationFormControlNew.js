@@ -228,15 +228,7 @@ function initMultistepForm(containerSelector) {
 
   // Choice Handler
   container.find(".multistep-choice").change(function () {
-    if (container.find("#first-question-no").is(":checked")) {
-      window.location.href = "/fos-light-offer";
-    } else {
-      goToStep(1);
-    }
-  });
-
-  container.find("#first-question-no").on("click", function () {
-    window.location.href = "/fos-light-offer";
+    goToStep(1);
   });
 
   // Form Submit
