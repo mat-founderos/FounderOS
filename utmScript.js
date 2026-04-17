@@ -77,22 +77,9 @@
       }
     });
 
-    /* Map fbclid to HubSpot's hs_facebook_click_id property.
-       Injects the hidden field if it doesn't exist in the form. */
-    var fbclid = getStored("fbclid");
-    if (fbclid) {
-      var forms = document.querySelectorAll("form");
-      for (var i = 0; i < forms.length; i++) {
-        var field = forms[i].querySelector('input[name="hs_facebook_click_id"]');
-        if (!field) {
-          field = document.createElement("input");
-          field.type = "hidden";
-          field.name = "hs_facebook_click_id";
-          forms[i].appendChild(field);
-        }
-        field.value = fbclid;
-      }
-    }
+    /* fbclid is already in ALL_PARAMS so it gets populated into
+       input[name="fbclid"] by the loop above. No special mapping needed.
+       The HubSpot form field is named "fbclid" (our custom property). */
   }
 
   /* ---- Init on DOM ready ---- */
