@@ -1,0 +1,6 @@
+# CHANGELOG - FounderOS Website Scripts
+
+## 2026-04-16 - Project registered and dual-booking bug identified
+**WHAT:** Jai Thomas (jai@cactuscontent.com.au) submitted one application form on /thank-you/workshop via organic IG traffic. The application-routing-ads.js scored him as direct_to_closer, redirecting to /book-now?route=closer_ads which loaded the Brand Strategy Call Calendly embed. He booked it at 05:29 UTC. Then the workshop registration flow also routed him to an Intro Call booking at 05:32 UTC. Two separate Calendly events, two DFY wow assets, two HubSpot meetings.
+**WHY:** The ads routing script (application-routing-ads.js) runs on ALL pages that have the #fos-application-main form, including organic pages like /thank-you/workshop. There is no page-context check. A high-scoring organic lead gets the same closer routing as a paid ads lead. Organic workshop leads should route to setter (Intro Call), not closer (Brand Strategy Call).
+**WATCH FOR:** Any organic lead that books a Brand Strategy Call directly. The Brand Strategy Call is meant for high-intent paid ads leads who score >= 19 with solo decision authority. Organic workshop leads should always route to Intro Call regardless of score.
