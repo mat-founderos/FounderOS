@@ -143,8 +143,21 @@ D. **Page-context routing** - Different script per page. /apply gets ads routing
 The Brand Strategy booking has zero UTMs proving it was not a tracked form submission redirect. The 3-minute gap and name casing difference ("thomas" vs "Thomas") suggest Jai navigated to /book-now independently or via an untracked path, then returned and completed the normal form flow.
 
 ## Next
-- Implement routing simplification per PROJECT_BRIEF_ROUTING_SIMPLIFICATION.md (APPROVED)
-- Create feature branch, rewrite application-routing-v2.js, test on Webflow staging
-- Don creates Calendly round robin event and provides URL
+- HANDOFF TO MATTHEW: routing-simplification branch completion + go-live. Deadline 2026-04-21 09:00 ET.
+- Full plan in HANDOFF-routing-simplification.md. All code changes require Don approval.
+- After go-live: update DFY Asset Pipeline FRONT_END_EVENTS set (Don task)
+- After go-live + 48h: delete _ads Calendly event variants (Don task)
+- After go-live + 1 week: delete deprecated routing scripts from repo (Don task)
 - Audit PLG tools routing in next session
-- NO merge to main without explicit approval
+
+## Session Notes (Apr 21 2026)
+- Handoff plan written for Matthew Calabia (Webflow). Branch: routing-simplification, 8 commits ahead, 1 behind main (clean merge).
+- Hard gates: no code changes without Don approval, 3 manual browser test cycles, Webflow stale page audit, merge only with approval.
+- Key gap for Matthew to close: /book-now Webflow page inline JS must accept ?route=qualified and ?route=nurture instead of old 4-value params.
+- Slack group DM sent to Don, Matt, Matthew, Nhery with full plan.
+
+## Session Notes (Apr 20 2026)
+- Code review of routing-simplification branch complete: 7 commits ahead, 1 behind main (clean merge)
+- Key gap identified: /book-now Webflow page still expects old route params (closer/closer_ads/setter/setter_ads) but new routing sends ?route=qualified
+- application-routing-ads.js (the live bug) is unchanged on this branch - only v2.js was rewritten. Webflow script reference must be swapped for the fix to take effect
+- Session pivoted to Nick machine remediation (see journal entry)
