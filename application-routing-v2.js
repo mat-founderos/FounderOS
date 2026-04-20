@@ -6,7 +6,7 @@
 
 (function () {
 
-  var QUALIFIED_THRESHOLD = 11;
+  var QUALIFIED_THRESHOLD = 19;
 
   var HARD_DISQUALIFIERS = [
     "pre_revenue",
@@ -14,9 +14,10 @@
   ];
 
   var ROUTE_URLS = {
-    qualified: "/book-now",
+    qualified: "/book-now?route=qualified",
     nurture: "/fos-light-offer?dq=not_ready"
   };
+
 
   var PARAM_FIELDS = [
     "email",
