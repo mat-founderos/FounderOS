@@ -6,7 +6,7 @@
 
 (function () {
 
-  var QUALIFIED_THRESHOLD = 19;
+  var QUALIFIED_THRESHOLD = 11;
 
   var HARD_DISQUALIFIERS = [
     "pre_revenue",
