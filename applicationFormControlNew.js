@@ -235,7 +235,16 @@ function initMultistepForm(containerSelector) {
 container.find(".multistep-form-modal").submit(function (e) {
   collectFormData();
 
+<<<<<<< HEAD
   currentStep = 7;
+=======
+  // Check form ID
+  if ($(this).attr("id") === "fos-application-main") {
+    currentStep = 10;
+  } else {
+    currentStep = 7;
+  }
+>>>>>>> main
 
   container.find(".status").val("complete");
 
