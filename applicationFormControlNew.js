@@ -233,14 +233,6 @@ function initMultistepForm(containerSelector) {
 
   // Form Submit
 container.find(".multistep-form-modal").submit(function (e) {
-  const currentStepElement = steps.eq(currentStep);
-
-  // 🚨 Validate last step before submitting
-  if (!validateStep(currentStepElement)) {
-    e.preventDefault();
-    return;
-  }
-
   collectFormData();
 
   // Check form ID
