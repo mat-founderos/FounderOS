@@ -155,7 +155,7 @@ function initMultistepForm(containerSelector) {
     }
 
     // Mandatory step logic: Steps 1,2,4,5,6,7 (Indexes 0,1,3,4,5,6)
-    const mandatorySteps = [0, 1, 3, 4, 5, 6];
+    const mandatorySteps = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     if (mandatorySteps.includes(currentStep)) {
       let hasValidInput = false;
 
