@@ -1,10 +1,12 @@
 # Project Brief: founderos.com Application Routing Simplification
 
 **Author:** Don Robinson
-**Date:** April 17, 2026
+**Date:** April 17, 2026 (revised 2026-04-21 to reflect new 5-event SOP)
 **Status:** APPROVED - Ready to implement
 **Repo:** Matt-Gray-Founder-OS/FounderOS (~/dev/FounderOS)
 **Related:** meetings-sync (n8n DFY Asset Pipeline), founder-os-web/fos-skills (PLG tools)
+
+**SOP UPDATE 2026-04-21:** This brief was originally written assuming a single Brand Strategy Call event would replace 4 events. The final SOP collapsed inbound to 5 round robins (one per source) + deletes 2 Intro Call events. Steps 1-7 still describe a single-event collapse for /apply specifically (which is correct - /apply uses cxvc-8mr-npb only). Step 8 lists final disposition for all 7 affected events. Read CLAUDE.md "Calendly Round Robins" section for the canonical 5-event mapping before acting on any step here.
 
 ---
 
@@ -32,7 +34,7 @@ Verified Apr 16 2026 via HubSpot trace, Calendly API, and JS audit:
 ### Principles
 1. **UTMs are attribution only.** Captured on page load, persisted, passed to Calendly as prefill params. Never used for routing.
 2. **Routing is score-based only.** Form answers determine qualified vs nurture. Period.
-3. **One Calendly round robin event.** Daniel Matallana + Robert Sjulson. Calendly handles distribution. Weighting for paid ads can be configured in Calendly's round robin settings.
+3. **One Calendly round robin event for /apply.** cxvc-8mr-npb (brand-strategy-call). Daniel Matallana + Robert Sjulson + Matthew Calabia (admin). Calendly handles distribution. Other inbound sources have their own dedicated round robins (TOOLS, Alberto, ARIA, Outbound setters) - all Brand Strategy Call type.
 4. **One routing script.** application-routing-v2.js becomes the single script. All other variants deleted.
 5. **Score + route written to HubSpot.** Closers see application_score on the contact record. Reports segment by score. No tier system - raw score is sufficient.
 
@@ -147,7 +149,7 @@ const selected = routes[route] || routes["setter"];
 ```
 **New code:**
 ```js
-const CALENDLY_URL = "PLACEHOLDER_ROUND_ROBIN_URL"; // Don provides
+const CALENDLY_URL = "https://calendly.com/d/cxvc-8mr-npb/brand-strategy-call";
 
 const params = new URLSearchParams(window.location.search);
 const email = params.get("email") || "";
@@ -220,16 +222,21 @@ window.addEventListener("load", function(){
 ### Step 8: Retire Duplicate Calendly Events (AFTER validation)
 **What:** Delete the duplicate Calendly events after confirming zero traffic on old routes.
 **Timeline:** 2+ weeks after new round robin receives all traffic.
-**Current Calendly events (verified Apr 16):**
-| Event | Scheduling URL | Event Type ID | Disposition |
-|-------|---------------|---------------|-------------|
-| Brand Strategy Call (organic) | calendly.com/d/cxqn-5hd-8fz | d95b3816-fada-492b-86a3-5c6b3ca344db | DELETE after migration |
-| Brand Strategy Call (ads) | calendly.com/d/cxvc-8mr-npb | TBD | DELETE after migration |
-| Intro Call (organic) | calendly.com/d/cw2s-j7z-zyk | TBD | DELETE after migration |
-| Intro Call (ads) | calendly.com/d/cvfx-kyh-8w6 | c4a71026-29e2-4a61-93af-ae7c353ec276 | DELETE after migration |
-| NEW Round Robin | Don creates | TBD | KEEP - sole booking event |
-**Don maps final disposition when creating the round robin event. All 4 existing events eventually retire.**
-**Risk:** High if done prematurely. Only execute after confirming zero bookings on old events for 2+ weeks.
+**Final Calendly disposition (updated Apr 21 2026):**
+
+5 Brand Strategy Call round robins survive (one per source). 2 Intro Call events deleted. No new event creation needed - cxvc-8mr-npb is the sole /apply event.
+
+| Source | Slug | Event Type ID | Disposition |
+|--------|------|---------------|-------------|
+| /apply (Webflow inbound) | cxvc-8mr-npb | 1bbff147 | KEEP - sole /apply event |
+| tools.founderos.com (PLG) | ct4n-hw4-d8m | 61d20b25 | KEEP |
+| Alberto (DM agent) | ct4g-kpp-zx8 | d08b16d4 | KEEP |
+| ARIA (chat agent) | ct4f-4rm-hv9 | 274a141d | KEEP |
+| Outbound setters | cxqn-5hd-8fz | d95b3816 | KEEP |
+| (legacy) Intro Call organic | cw2s-j7z-zyk | 8c143efd | DELETE T+48h |
+| (legacy) Intro Call paid ads | cvfx-kyh-8w6 | c4a71026 | DELETE T+48h |
+
+**Risk:** Low. Only the Intro Call events are deleted, and only after T+48h.
 
 ### Step 9: Meta Conversions API
 **What:** Use Calendly's native integration with Meta Conversions API to fire conversion events when a booking is made.

@@ -8,9 +8,9 @@
 
 ## What This Branch Does
 
-The `routing-simplification` branch fixes a live bug where organic leads get routed to the closer's Brand Strategy Call instead of the setter's Intro Call. Root cause: `application-routing-ads.js` runs on organic pages and has zero UTM awareness.
+The `routing-simplification` branch fixes a live bug where leads get routed to wrong Calendly events because the old script used UTMs for routing. Root cause: `application-routing-ads.js` runs on organic pages and conflates attribution with routing.
 
-**The fix:** `application-routing-v2.js` was rewritten to use score-only routing. Two routes out (qualified/nurture), no UTM involvement in routing decisions. UTMs ride along as attribution params only.
+**The fix:** `application-routing-v2.js` was rewritten to use score-only routing. Two routes out (qualified/nurture), no UTM involvement in routing decisions. UTMs ride along as attribution params only. Single Brand Strategy Call event for all qualified /apply leads (cxvc-8mr-npb). No more Intro Call. No more closer/setter split.
 
 **Branch status:** 8 commits ahead of main, 1 behind (utmScript.js - clean merge). Code review complete Apr 20.
 
@@ -48,15 +48,15 @@ Read these files to understand the routing logic:
 | `utmScript.js` | 30-day cookies, fbclid + hsa_* param capture for HubSpot Ads attribution. |
 | `PROJECT_BRIEF_ROUTING_SIMPLIFICATION.md` | Full design doc with target architecture, Calendly events to keep/delete, execution order. |
 
-**Key gap to close:** The `/book-now` Webflow page currently reads the `route` URL param and loads Calendly embeds for 4 values: `closer`, `closer_ads`, `setter`, `setter_ads`. The new routing sends `?route=qualified` or `?route=nurture`. The `/book-now` inline JS must be updated to handle these new values.
+**Key gap to close:** The `/book-now` Webflow page previously read the `route` URL param and switched between 4 Calendly events. The new routing sends `?route=qualified` or `?route=nurture`. The `/book-now` inline JS now loads a single Calendly embed (cxvc-8mr-npb) and accepts qualified/nurture only. Old route values (closer, closer_ads, setter, setter_ads) should fall through to a default redirect for in-flight backward compat.
 
 ### Phase 3: Fix /book-now Page (30 min)
 
 This is Webflow-side work. The `/book-now` page inline JS needs to:
 
-1. Accept `?route=qualified` and load the Brand Strategy Call Calendly embed (the organic one: `calendly.com/d/cxqn-5hd-8fz`)
+1. Accept `?route=qualified` and load the Brand Strategy Call Calendly embed (the sole /apply event: `calendly.com/d/cxvc-8mr-npb`)
 2. Accept `?route=nurture` and redirect to the nurture flow (or show a "we'll be in touch" message)
-3. Keep backward compatibility for any in-flight traffic using old route params (`closer`, `setter`) for 48 hours after go-live
+3. Keep backward compatibility for any in-flight traffic using old route params (`closer`, `setter`) for 48 hours after go-live. **TIMING ANCHOR:** The 48h backward-compat window starts at T0 = the merge-to-main timestamp. The Calendly delete window (Task #10) starts AFTER that backward-compat window expires - i.e., delete Intro Call events at T0+48h ONLY if zero traffic on old routes for 48h. Do NOT delete Calendly events while old route params still arrive at /book-now.
 4. Pass UTM params from the URL through to Calendly as prefill params
 
 **IF any code changes are needed in the repo scripts** (not Webflow inline JS), stop and DM Don with:
@@ -75,32 +75,32 @@ The Webflow pages currently load `application-routing-ads.js` from GitHub Pages.
 
 ### Phase 5: Manual Testing - 3 Full Cycles (60 min)
 
-**Test Cycle 1: Organic Lead - Should Route to Setter (Intro Call)**
+**Test Cycle 1: Organic Qualified Lead**
 
 - [ ] Open `/apply` in incognito (no UTMs in URL)
-- [ ] Fill out the application form with test data
-- [ ] Submit
-- [ ] Verify redirect goes to `/book-now?route=qualified` (or appropriate route)
-- [ ] Verify the correct Calendly embed loads (Intro Call for organic leads, not Brand Strategy Call)
-- [ ] Verify UTMs are NOT present in the Calendly prefill params (because there are none)
-- [ ] Check HubSpot: verify the form submission landed with correct properties
-
-**Test Cycle 2: Paid Ads Lead - Should Route Based on Score**
-
-- [ ] Open `/apply?utm_source=meta&utm_medium=paid&utm_campaign=test` in incognito
-- [ ] Fill out form with high-scoring answers (high revenue, solo decision maker)
+- [ ] Fill out the application form with high-scoring answers (score >= 11, no DQ)
 - [ ] Submit
 - [ ] Verify redirect goes to `/book-now?route=qualified`
-- [ ] Verify Calendly embed loads with UTM params passed through as prefill
-- [ ] Check HubSpot: verify utm_source=meta, utm_medium=paid landed on the contact
+- [ ] Verify Calendly embed loads from cxvc-8mr-npb (Brand Strategy Call)
+- [ ] Verify UTMs are NOT present in the Calendly prefill params (because there are none)
+- [ ] Check HubSpot: verify the form submission landed with application_score, application_route=qualified, application_disqualifier=none
+
+**Test Cycle 2: Paid Qualified Lead - UTMs as attribution only**
+
+- [ ] Open `/apply?utm_source=meta&utm_medium=paid&utm_campaign=test` in incognito
+- [ ] Fill out form with high-scoring answers (score >= 11, no DQ)
+- [ ] Submit
+- [ ] Verify redirect goes to `/book-now?route=qualified` (same route as organic - UTMs do not change routing)
+- [ ] Verify Calendly embed loads from cxvc-8mr-npb with UTM params passed through as prefill
+- [ ] Check HubSpot: verify utm_source=meta, utm_medium=paid, utm_campaign=test landed on the contact
 
 **Test Cycle 3: Nurture Path - Low Score Lead**
 
 - [ ] Open `/apply` in incognito
-- [ ] Fill out form with low-scoring answers
+- [ ] Fill out form with low-scoring answers (score < 11)
 - [ ] Submit
-- [ ] Verify redirect goes to nurture path (not `/book-now`)
-- [ ] Check HubSpot: verify the form submission landed
+- [ ] Verify redirect goes to `/fos-light-offer?dq=not_ready` (NOT to `/book-now`)
+- [ ] Check HubSpot: verify the form submission landed with application_route=nurture
 
 **Document results for each cycle:**
 - Screenshot of the Calendly embed that loaded (or redirect destination)
@@ -119,15 +119,41 @@ Manually check every Webflow page that has an application form or Calendly embed
 - [ ] Check for any pages with hardcoded Calendly event type IDs that reference the _ads variants
 - [ ] List every page checked and its status
 
-### Phase 7: Go-Live (15 min)
+### Phase 7: Pre-Merge Calendly UI Verification (10 min)
 
-Only after all 3 test cycles pass and stale page audit is clean:
+Before merge, Don MUST confirm in the Calendly UI that the 5 canonical round robins have correct member configuration per the SOP:
+- cxvc-8mr-npb: Daniel, Robert, Matthew (admin)
+- ct4n-hw4-d8m: Daniel, Robert
+- ct4g-kpp-zx8: Daniel, Robert
+- ct4f-4rm-hv9: Daniel, Robert
+- cxqn-5hd-8fz: Daniel, Robert
+
+Round robin event types CANNOT be updated via API (Calendly limitation). If members are wrong post-merge, the SOP is broken and there's no API rollback. Verify in UI first.
+
+### Phase 8: Go-Live (15 min)
+
+Only after all 3 test cycles pass, stale page audit is clean, and Calendly UI verification passes:
 
 1. DM Don with test results and request merge approval
 2. After approval: `git checkout main && git merge routing-simplification && git push origin main`
 3. Verify GitHub Pages deploys the new scripts
 4. Verify Webflow pages are loading the new scripts (check network tab)
 5. Run one final smoke test on `/apply` with incognito browser
+
+### Phase 9: Post-Cutover Ownership (Don to assign)
+
+The Tier 2 PENDING blocks across projects need explicit owners and deadlines, otherwise downstream code will quietly diverge from the new SOP. Don to assign:
+
+| Project | Migration | Owner | Deadline |
+|---------|-----------|-------|----------|
+| paid-ads-dashboard | Edge function event-type-ID model + report classify_meeting | TBD | TBD |
+| sales-ops-eow | classify_meeting must accept plain "Calendly: Brand Strategy Call" before T+48h | TBD | TBD |
+| meetings-sync (n8n) | Update flow2/flow3 to route by event_type_uri not title | TBD | TBD |
+| velocity/plg-tools | form-utils.js + 28 HTML files collapse to single TOOLS event | TBD | TBD |
+| velocity herb-sales-deck | Hardcoded cw2s-j7z-zyk CTA replaced with ct4n-hw4-d8m | TBD | **BEFORE T+48h** (Calendly delete) |
+| aria-triage-agent-v2 | server/config/routing.js + tests collapse to single ARIA event | TBD | TBD |
+| alberto-calendly-routing | 5-tier table replaced with single ct4g-kpp-zx8; in-flight bookings on cwym-hn5-hgz / cr82-2vz-hdt have a migration plan | TBD | TBD |
+| fos-context CLAUDE.md sync | hubspot-ops.md materialized to ~/.claude/rules/ via pull | Don | Next pull cycle |
 
 ---
 
@@ -143,21 +169,26 @@ If any of these come up, DM Don immediately. Do not try to solve them alone:
 
 ---
 
-## Calendly Events Reference
+## Calendly Events Reference (updated Apr 21 2026)
 
-| Call Type | Keep | Calendly URL |
-|-----------|------|-------------|
-| Brand Strategy Call (organic) | YES - becomes THE Brand Strategy Call | calendly.com/d/cxqn-5hd-8fz |
-| Brand Strategy Call (ads) | DELETE after migration | calendly.com/d/cxvc-8mr-npb |
-| Intro Call (organic) | YES - becomes THE Intro Call | calendly.com/d/cw2s-j7z-zyk |
-| Intro Call (ads) | DELETE after migration | calendly.com/d/cvfx-kyh-8w6 |
+New architecture: 5 Brand Strategy Call round robins, one per traffic source. No Intro Call exists.
 
-Do NOT delete the _ads variants until 48 hours after go-live, in case any in-flight bookings reference them.
+| Source | Calendly URL | Event Type ID | Disposition |
+|--------|-------------|---------------|-------------|
+| /apply (Webflow inbound) | calendly.com/d/cxvc-8mr-npb | 1bbff147 | KEEP - sole /apply event |
+| tools.founderos.com (PLG) | calendly.com/d/ct4n-hw4-d8m | 61d20b25 | KEEP |
+| Alberto (DM agent) | calendly.com/d/ct4g-kpp-zx8 | d08b16d4 | KEEP |
+| ARIA (chat agent) | calendly.com/d/ct4f-4rm-hv9 | 274a141d | KEEP |
+| Outbound setters | calendly.com/d/cxqn-5hd-8fz | d95b3816 | KEEP |
+| (legacy) Intro Call organic | calendly.com/d/cw2s-j7z-zyk | 8c143efd | DELETE T+48h |
+| (legacy) Intro Call paid ads | calendly.com/d/cvfx-kyh-8w6 | c4a71026 | DELETE T+48h |
+
+Do NOT delete the Intro Call variants until 48 hours after go-live, in case any in-flight bookings reference them.
 
 ---
 
 ## After Go-Live
 
 - Monitor HubSpot for 2 hours: verify form submissions are routing correctly
-- Check DFY Asset Pipeline (n8n LeGGfFKaeGGOjB5Y): update FRONT_END_EVENTS set to only include the 2 surviving Calendly event type IDs (this is a Don task, not Matthew)
+- Check DFY Asset Pipeline (n8n LeGGfFKaeGGOjB5Y): update FRONT_END_EVENTS set to only include the 5 surviving Calendly event type IDs per the new SOP (cxvc-8mr-npb, ct4n-hw4-d8m, ct4g-kpp-zx8, ct4f-4rm-hv9, cxqn-5hd-8fz). Decide which subset of those triggers wow assets - likely all 5 since every booking is now Brand Strategy Call. (This is a Don task, not Matthew.)
 - Delete deprecated routing scripts from repo after 1 week (Don task)
