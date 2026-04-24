@@ -262,6 +262,15 @@ container.find(".multistep-form-modal").submit(function (e) {
   }
 
   fathom.trackEvent("Application Form Submit");
+
+  // Meta CAPI Lead fire — only for qualified leads (score-based routing set
+  // by application-routing-v2.js into the application_route hidden field).
+  // Safe no-op if capi-lead.js is not loaded yet.
+  var formEl = this;
+  var routeEl = formEl.querySelector && formEl.querySelector("[name=\"application_route\"]");
+  if (routeEl && routeEl.value === "qualified" && typeof window.fireMetaCAPILead === "function") {
+    window.fireMetaCAPILead(formEl);
+  }
 });
 
   // Checkbox background logic

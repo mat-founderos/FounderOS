@@ -1,6 +1,6 @@
 # Meta CAPI Integration (subproject of FounderOS)
 
-## Status: Scaffold only — branch `meta-capi`, no code yet. Not merged to main.
+## Status: Code live on branch `meta-capi`. Edge function deployed. Awaiting Webflow script tag + go-live. Not merged to main.
 ## Purpose: Fire a Meta Conversions API `Lead` event from the Webflow front end when an application scores qualified (>= 11 per `application-routing-v2.js` QUALIFIED_THRESHOLD).
 ## Parent: Matt-Gray-Founder-OS/FounderOS (GitHub Pages, founderos.com).
 ## Deploy: Client-side JS loaded on /apply via `<script src="matt-gray-founder-os.github.io/FounderOS/meta-capi/{file}.js">`. Merge to main to deploy — repo auto-publishes to GitHub Pages on push.
@@ -14,17 +14,49 @@ Client Meta Pixel events are blocked by ad blockers and ITP. CAPI is the server-
 ## Dedup with Meta Pixel
 Both the Pixel `fbq('track', 'Lead', ...)` and the CAPI call must emit the **same `event_id`** so Meta dedupes them on server side. Without this, a qualified lead who successfully fires BOTH gets double-counted.
 
-## Open design questions
-1. Fire timing: on qualified-redirect moment, or on Calendly booking completion? (Pixel typically fires on redirect; CAPI can do either or both.)
-2. Enhanced match data — which fields to hash and send: email (required), phone, first_name, last_name, zip, city, country. Need sha256 normalization per Meta spec.
-3. `event_source_url`: the page where the conversion "happened" — `/apply` or `/book-now`?
-4. `action_source`: `website` for Webflow front end.
-5. External token scope: does the existing Meta API token (vaulted) include `ads_management` required for CAPI, or do we need a dedicated CAPI access token from Events Manager? (Answered in Vault Check — see watch-for.)
+## Architecture — Path A (proxy, shipped)
 
-## Watch-for (to populate during implementation)
-- Token exposure: the access token for CAPI is what Meta requires for server-auth. We have to hide this via a proxy (n8n / Supabase edge / Vercel function). Calling Meta Graph API directly from client-side code requires embedding the token in JS, which IS a security risk regardless of how we phrase it. Need operator decision: proxy endpoint, OR use only Pixel enhanced conversions (no CAPI token from client).
-- Rate limits: Meta Graph API has per-token per-hour limits. Client-side fire per user is fine; bursts are not a concern at inbound application volumes.
-- `test_event_code`: set during dev so events show up in Events Manager "Test Events" tab and don't pollute production signal.
+```
+Webflow /apply  (matt-gray-founder-os.github.io/FounderOS/meta-capi/capi-lead.js)
+  └── applicationFormControlNew.js submit handler
+        └── if application_route == "qualified":
+              └── window.fireMetaCAPILead(form)
+                    ├── fbq("track", "Lead", {eventID: <uuid>})
+                    └── fetch(<edge>/meta-capi-lead, {event_id: <same uuid>, email, ...})
+                          └── Supabase edge function (yhvssclmrddiowlccvjc)
+                                ├── reads meta_ads_token, founder_os_meta_pixel,
+                                │   meta_capi_test_event_code from vault
+                                ├── sha256 normalize + hash PII
+                                └── POST graph.facebook.com/v21.0/{pixel}/events
+```
+
+## Files
+- `capi-lead.js` — client module, exposes `window.fireMetaCAPILead(form)`. `IS_TEST = true` constant routes all fires to Events Manager Test Events tab until flipped.
+- `../applicationFormControlNew.js` — one 7-line wiring block at end of submit handler reads `application_route` hidden field, invokes the fire function on qualified.
+- Edge function source: `~/dev/fos-context/supabase/functions/meta-capi-lead/index.ts` (deployed on central vault project).
+
+## Webflow embed (not done — next step)
+
+Add a script tag to `/apply` page in Webflow:
+```html
+<script src="https://matt-gray-founder-os.github.io/FounderOS/meta-capi/capi-lead.js" defer></script>
+```
+`applicationFormControlNew.js` must load FIRST (already does — it is loaded on /apply today). `capi-lead.js` must define `window.fireMetaCAPILead` before the submit handler fires; the wiring is defensive (`typeof window.fireMetaCAPILead === "function"`) so a missed load is a silent no-op, not a crash.
+
+## Go-live sequence
+1. Merge this branch to main (GitHub Pages auto-deploys `capi-lead.js`).
+2. Add the `<script>` tag to `/apply` in Webflow.
+3. Submit a qualified application on /apply → verify event in Events Manager → Test Events for pixel 717725617464118.
+4. Verify `meta_capi_events` audit row lands on central vault project.
+5. Flip `IS_TEST = false` in `capi-lead.js`, commit to main, verify live event in Events Manager → Overview.
+
+## Watch-for
+- `IS_TEST` is on `capi-lead.js` line 11. Flipping it is a one-char edit but has big consequences (pollutes live ad-attribution until flipped back). Always pair the flip with at least one qualified submit + Test Events verification.
+- If Meta rotates `meta_ads_token` or `founder_os_meta_pixel`, the edge function picks up the new value on next call (vault is read per-request, no cache). No redeploy needed.
+- If CORS origin list in edge function needs extension (new Webflow preview domain, staging URL), edit `ALLOWED_ORIGINS` in `supabase/functions/meta-capi-lead/index.ts` and redeploy via `scripts/deploy-edge-function.sh meta-capi-lead --project-ref yhvssclmrddiowlccvjc`.
+- Rate limit is in-memory per Fluid Compute instance. 5 req / 5 min per IP. If we ever see legitimate applications getting rate limited (unlikely at current volume), raise `RATE_LIMIT_MAX` or switch to a table-backed counter.
+- Dedup: the `event_id` UUID is generated client-side in `capi-lead.js` once per submit, passed to both `fbq` and the CAPI POST. If the Pixel or CAPI call is ever moved out of `fireMetaCAPILead` and generates its own UUID, Meta will double-count. Keep the single-source-of-UUID discipline.
+- The Pixel `fbq` must already be loaded on the page for the `track Lead` call to succeed. If the Pixel ID changes in Webflow but vault pixel ID lags, server CAPI fires against the wrong pixel. Update both together.
 
 ## Related
 - `application-routing-v2.js` (sibling) — the routing script we hook into

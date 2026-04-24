@@ -1,0 +1,96 @@
+/* ========================================
+   Founder OS — Meta CAPI Lead
+   Client-side companion for application-routing-v2.js.
+   Fires when score >= QUALIFIED_THRESHOLD.
+   ======================================== */
+
+(function () {
+
+  // Flip to false when ready to send live. While true, every call includes
+  // test_event_code (vaulted as meta_capi_test_event_code) and events land in
+  // Events Manager → Test Events, not live ad attribution.
+  var IS_TEST = true;
+
+  // Supabase edge function endpoint. Deployed on central vault project
+  // (yhvssclmrddiowlccvjc). Reads meta_ads_token + founder_os_meta_pixel
+  // + meta_capi_test_event_code from vault at request time.
+  var CAPI_ENDPOINT = "https://yhvssclmrddiowlccvjc.supabase.co/functions/v1/meta-capi-lead";
+
+  function uuid4() {
+    if (crypto && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    // RFC4122 v4 fallback for older browsers
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0;
+      var v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  function readField(form, name) {
+    var el = form.querySelector("[name=\"" + name + "\"], #" + name);
+    return el && el.value ? String(el.value).trim() : "";
+  }
+
+  function firePixelLead(eventId) {
+    try {
+      if (typeof window.fbq === "function") {
+        window.fbq("track", "Lead", { currency: "USD", value: 0 }, { eventID: eventId });
+      }
+    } catch (e) {
+      // Pixel failure must not break CAPI path. Log, continue.
+      if (window.console) console.warn("[FOS CAPI] fbq call failed:", e);
+    }
+  }
+
+  function postCapi(eventId, form) {
+    var payload = {
+      event_id: eventId,
+      email: readField(form, "email"),
+      phone: readField(form, "phone"),
+      first_name: readField(form, "first_name"),
+      last_name: readField(form, "last_name"),
+      event_source_url: window.location.origin + window.location.pathname,
+      utm_source: readField(form, "utm_source"),
+      utm_medium: readField(form, "utm_medium"),
+      utm_campaign: readField(form, "utm_campaign"),
+      utm_term: readField(form, "utm_term"),
+      utm_content: readField(form, "utm_content"),
+      score: Number(readField(form, "application_score")) || undefined,
+      is_test: IS_TEST,
+    };
+
+    // fire-and-forget: do not block the redirect path. keepalive=true
+    // lets the POST survive navigation, so the browser still sends it even
+    // if Webflow's redirect fires microseconds later.
+    try {
+      fetch(CAPI_ENDPOINT, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+        mode: "cors",
+      }).catch(function (e) {
+        if (window.console) console.warn("[FOS CAPI] proxy post failed:", e);
+      });
+    } catch (e) {
+      if (window.console) console.warn("[FOS CAPI] proxy fetch threw:", e);
+    }
+  }
+
+  /**
+   * Public API. Call from the form submit handler in
+   * applicationFormControlNew.js on qualified submissions.
+   *
+   * Generates a single event_id used by both the client Pixel call
+   * (fbq with eventID) AND the server CAPI call, so Meta dedupes them.
+   */
+  window.fireMetaCAPILead = function (form) {
+    if (!form) return;
+    var eventId = uuid4();
+    firePixelLead(eventId);
+    postCapi(eventId, form);
+  };
+
+})();
