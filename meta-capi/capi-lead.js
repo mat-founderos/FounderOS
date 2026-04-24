@@ -9,7 +9,7 @@
   // Flip to false when ready to send live. While true, every call includes
   // test_event_code (vaulted as meta_capi_test_event_code) and events land in
   // Events Manager → Test Events, not live ad attribution.
-  var IS_TEST = true;
+  var IS_TEST = false;
 
   // Supabase edge function endpoint. Deployed on central vault project
   // (yhvssclmrddiowlccvjc). Reads meta_ads_token + founder_os_meta_pixel
