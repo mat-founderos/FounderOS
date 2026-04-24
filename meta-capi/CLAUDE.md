@@ -1,6 +1,6 @@
 # Meta CAPI Integration (subproject of FounderOS)
 
-## Status: Code live on branch `meta-capi`. Edge function deployed. Awaiting Webflow script tag + go-live. Not merged to main.
+## Status: LIVE. Merged to main 2026-04-24, edge function deployed, `capi-lead.js` served from GitHub Pages, `IS_TEST=false` (firing to Meta live reporting). Last remaining step: Webflow `<script>` tag added to /apply page (operator task — tag provided but not yet verified pasted).
 ## Purpose: Fire a Meta Conversions API `Lead` event from the Webflow front end when an application scores qualified (>= 11 per `application-routing-v2.js` QUALIFIED_THRESHOLD).
 ## Parent: Matt-Gray-Founder-OS/FounderOS (GitHub Pages, founderos.com).
 ## Deploy: Client-side JS loaded on /apply via `<script src="matt-gray-founder-os.github.io/FounderOS/meta-capi/{file}.js">`. Merge to main to deploy — repo auto-publishes to GitHub Pages on push.
