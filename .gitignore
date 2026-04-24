@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Deprecated code
+deprecated/
+
+# Manual backup files
+backup codes/
