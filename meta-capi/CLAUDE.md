@@ -50,6 +50,16 @@ Add a script tag to `/apply` page in Webflow:
 4. Verify `meta_capi_events` audit row lands on central vault project.
 5. Flip `IS_TEST = false` in `capi-lead.js`, commit to main, verify live event in Events Manager → Overview.
 
+## Deferred to next session (non-blocking)
+
+1. **Phone country-code preservation verification.** Current normalization `phone.replace(/\D+/g, "")` strips all non-digits including the leading `+`. Meta match quality is significantly lower for phone numbers without a country code. This is acceptable IF Webflow's `phone-script-maxmind.js` always prepends the country code digits BEFORE submit — that has not been verified. Action: open `/apply` in browser, fill the phone field, inspect the form element's `.value` on submit, confirm country code is in the string. If not, prepend based on MaxMind-detected country in the phone script.
+
+2. **Distributed-IP abuse protection.** Current baseline is CORS allowlist + per-IP rate limit (5/5min, in-memory per Fluid Compute instance). A distributed attacker (many source IPs) bypasses both. Threat model: someone burns the pixel with fake Lead events, polluting Meta ad attribution. Small real risk at current application volumes. Mitigations if ever needed: HMAC-signed timestamp from client (requires a shared secret), Cloudflare Turnstile / hCaptcha token check, move rate limit to a Postgres-backed counter (persists across instances).
+
+3. **Scheduled error-rate alert.** Nothing watches `meta_capi_events` for spikes in `error_reason IS NOT NULL`. Add `/schedule` trigger (hourly) that queries last-hour error count and posts to Slack / announcements if above a threshold. Pattern mirrors the fos-call-scoring `fathom_ingestion_audit` trigger.
+
+4. **Test harness file.** Unit tests for the edge function do not exist. Precedent: `fos-context/supabase/functions/_shared/utils.ts` has tests in `vault_migration_test.ts`. Add `meta-capi-lead/index_test.ts` covering: UUID validation, CORS allowlist, rate limit math, SHA256 of sample email/phone, Meta-vs-network-vs-parse error classification. Run via `deno test` in the edge function deploy script's pre-deploy E2E slot.
+
 ## Watch-for
 - `IS_TEST` is on `capi-lead.js` line 11. Flipping it is a one-char edit but has big consequences (pollutes live ad-attribution until flipped back). Always pair the flip with at least one qualified submit + Test Events verification.
 - If Meta rotates `meta_ads_token` or `founder_os_meta_pixel`, the edge function picks up the new value on next call (vault is read per-request, no cache). No redeploy needed.
