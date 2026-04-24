@@ -44,6 +44,11 @@ All inbound bookings flow through Brand Strategy Call round robins. No Intro Cal
 - `applicationFormControlAds.js` - matches old `-ads` script pattern. Verify load status during Task #5.
 - `application-routing-backup.js` - explicitly named backup. Slated for delete T+1 week per Task #12.
 
+### Subprojects
+| Folder | Purpose |
+|--------|---------|
+| meta-capi/ | Meta Conversions API integration — fires Lead event when application routing scores >= 11. Branch `meta-capi` (not in main yet). See meta-capi/CLAUDE.md. |
+
 ### Key Files
 | File | Purpose |
 |------|---------|
