@@ -242,7 +242,7 @@ window.addEventListener("load", function(){
 **What:** Use Calendly's native integration with Meta Conversions API to fire conversion events when a booking is made.
 **Why:** Gives Meta cleaner conversion signal on the actual booking event, not a page visit. Removes conversion tracking from our website JS entirely.
 **How:** Configure in Calendly's integration settings. Not a code change.
-**Credentials:** Meta Ads API token and account ID in Supabase Vault (keys: meta_ads_token, meta_ads_account_id)
+**Credentials:** Meta Ads API token and account ID in Supabase Vault (keys: meta_ads_token, meta_ad_account_id)
 **Owner:** Don configures in Calendly UI
 **Risk:** None to website. Additive Meta signal.
 
