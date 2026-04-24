@@ -16,6 +16,10 @@
   // + meta_capi_test_event_code from vault at request time.
   var CAPI_ENDPOINT = "https://yhvssclmrddiowlccvjc.supabase.co/functions/v1/meta-capi-lead";
 
+  // Per-form dedup — WeakSet keyed by form element. Prevents double-fire on
+  // rapid double-click submits. Resets on page navigation.
+  var FIRED_FORMS = new WeakSet();
+
   function uuid4() {
     if (crypto && typeof crypto.randomUUID === "function") {
       return crypto.randomUUID();
@@ -85,9 +89,18 @@
    *
    * Generates a single event_id used by both the client Pixel call
    * (fbq with eventID) AND the server CAPI call, so Meta dedupes them.
+   *
+   * Idempotent per-form: multiple calls for the same form element fire
+   * exactly once. Protects against double-click submit + any future
+   * rewiring mistake that might call the public API twice.
    */
   window.fireMetaCAPILead = function (form) {
     if (!form) return;
+    if (FIRED_FORMS.has(form)) {
+      if (window.console) console.warn("[FOS CAPI] duplicate fire suppressed");
+      return;
+    }
+    FIRED_FORMS.add(form);
     var eventId = uuid4();
     firePixelLead(eventId);
     postCapi(eventId, form);
