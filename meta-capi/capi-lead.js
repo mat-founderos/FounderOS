@@ -14,7 +14,7 @@
   // Supabase edge function endpoint. Deployed on central vault project
   // (yhvssclmrddiowlccvjc). Reads meta_ads_token + founder_os_meta_pixel
   // + meta_capi_test_event_code from vault at request time.
-  var CAPI_ENDPOINT = "https://yhvssclmrddiowlccvjc.supabase.co/functions/v1/meta-capi-lead";
+  var CAPI_ENDPOINT = "https://ldspjkntkuuqlwrdefzh.supabase.co/functions/v1/meta-capi-lead";
 
   // Per-form dedup — WeakSet keyed by form element. Prevents double-fire on
   // rapid double-click submits. Resets on page navigation.
